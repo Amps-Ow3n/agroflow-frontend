@@ -8,7 +8,7 @@ import DeliveryForm from "../../components/deliveries/DeliveryForm";
 import DeliveryHistoryTable from "../../components/deliveries/DeliveryHistoryTable";
 import PageNav from "../../components/navigation/PageNav";
 import DeliverySummary from "../../components/deliveries/DeliverySummary";
-
+import { useCallback } from "react";
 const DeliveriesPage = () => {
   const { userId, token } = useAuth();
 
@@ -17,37 +17,48 @@ const DeliveriesPage = () => {
   const [error, setError] = useState(null);
   const [editingDelivery, setEditingDelivery] = useState(null);
 
-  const fetchDeliveries = async () => {
-    setLoading(true);
-    setError(null);
+  const fetchDeliveries = useCallback(async () => {
+  setLoading(true);
+  setError(null);
 
-    try {
-      const data = await getDeliveries({ farmer_id: userId }, token);
+  try {
+    const data = await getDeliveries({ farmer_id: userId }, token);
 
-      if (Array.isArray(data)) setDeliveries(data);
-      else if (data && Array.isArray(data.deliveries)) setDeliveries(data.deliveries);
-      else setDeliveries([]);
-    } catch (err) {
-      const detail = err.response?.data?.detail;
-
-      if (typeof detail === "string") setError(detail);
-      else if (Array.isArray(detail)) setError(detail.map(e => e.msg).join(", "));
-      else if (detail && typeof detail === "object") setError(detail.msg || "Unexpected server error");
-      else setError("Error fetching deliveries");
-
+    if (Array.isArray(data)) {
+      setDeliveries(data);
+    } else if (data && Array.isArray(data.deliveries)) {
+      setDeliveries(data.deliveries);
+    } else {
       setDeliveries([]);
-    } finally {
-      setLoading(false);
     }
-  };
+  } catch (err) {
+    const detail = err.response?.data?.detail;
 
-  useEffect(() => {
-    if (userId && token) fetchDeliveries();
-  }, [userId, token]);
+    if (typeof detail === "string") {
+      setError(detail);
+    } else if (Array.isArray(detail)) {
+      setError(detail.map(e => e.msg).join(", "));
+    } else if (detail && typeof detail === "object") {
+      setError(detail.msg || "Unexpected server error");
+    } else {
+      setError("Error fetching deliveries");
+    }
+
+    setDeliveries([]);
+  } finally {
+    setLoading(false);
+  }
+}, [userId, token]);
+
+useEffect(() => {
+  if (userId && token) {
+    fetchDeliveries();
+  }
+}, [fetchDeliveries, userId, token]);
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:8000/deliveries/${id}`, {
+      await fetch(`https://agroflow-backend-ghom.onrender.com/deliveries/${id}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` }
       });

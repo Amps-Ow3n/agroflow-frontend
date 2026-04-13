@@ -7,29 +7,29 @@ import { useAuth } from "../../context/AuthContext";
 import LoadingSpinner from "../../components/ui/LoadingSpinner";
 import EmptyState from "../../components/ui/EmptyState";
 import PageNav from "../../components/navigation/PageNav";
-
+import { useCallback } from "react";
 const CommitmentsPage = () => {
   const { token } = useAuth();
   const [commitments, setCommitments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchCommitments = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getCommitments(token);
-      setCommitments(data);
-    } catch (err) {
-      setError(err.response?.data?.detail || "Error fetching commitments");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchCommitments = useCallback(async () => {
+  setLoading(true);
+  setError(null);
+  try {
+    const data = await getCommitments(token);
+    setCommitments(data);
+  } catch (err) {
+    setError(err.response?.data?.detail || "Error fetching commitments");
+  } finally {
+    setLoading(false);
+  }
+}, [token]);
 
-  useEffect(() => {
-    fetchCommitments();
-  }, []);
+useEffect(() => {
+  fetchCommitments();
+}, [fetchCommitments]);
 
   const sections = [
     { id: "commitment-form", label: "Create" },

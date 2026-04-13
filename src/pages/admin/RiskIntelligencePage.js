@@ -8,7 +8,7 @@ import PageNav from "../../components/navigation/PageNav";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { getRiskIntelligence } from "../../services/dashboardService";
-
+import { useCallback } from "react";
 const RiskIntelligencePage = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
@@ -17,21 +17,21 @@ const RiskIntelligencePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchRiskData = async () => {
-    setLoading(true);
-    try {
-      const res = await getRiskIntelligence(token);
-      setData(res);
-    } catch (err) {
-      setError(err.response?.data?.detail || "Failed to load risk intelligence data");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchRiskData = useCallback(async () => {
+  setLoading(true);
+  try {
+    const res = await getRiskIntelligence(token);
+    setData(res);
+  } catch (err) {
+    setError(err.response?.data?.detail || "Failed to load risk intelligence data");
+  } finally {
+    setLoading(false);
+  }
+}, [token]);
 
-  useEffect(() => {
-    fetchRiskData();
-  }, []);
+useEffect(() => {
+  fetchRiskData();
+}, [fetchRiskData]);
 
   if (loading) return <LoadingSpinner message="Analyzing system risk signals..." />;
   if (error) return <EmptyState message={error} />;

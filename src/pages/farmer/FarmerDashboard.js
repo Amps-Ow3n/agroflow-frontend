@@ -14,6 +14,7 @@ import WhyExplanationsCard from "../../components/dashboard/WhyExplanationsCard"
 
 import PageContainer from "../../components/layout/PageContainer";
 import PageNav from "../../components/navigation/PageNav";
+import { useCallback } from "react";
 
 const FarmerDashboard = () => {
   const { userId, token } = useAuth();
@@ -21,22 +22,22 @@ const FarmerDashboard = () => {
   const [error, setError] = useState(null);
   const [dashboardData, setDashboardData] = useState(null);
 
-  const fetchDashboard = async () => {
-    setLoading(true);
-    try {
-      const data = await getFarmerDashboard(userId, token);
-      setDashboardData(data);
-    } catch (err) {
-      setError(err.response?.data?.detail || "Error fetching dashboard data");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const fetchDashboard = useCallback(async () => {
+  setLoading(true);
+  try {
+    const data = await getFarmerDashboard(userId, token);
+    setDashboardData(data);
+  } catch (err) {
+    setError(err.response?.data?.detail || "Error fetching dashboard data");
+  } finally {
+    setLoading(false);
+  }
+}, [userId, token]);
 
-  useEffect(() => {
-    if (!userId || !token) return;
-    fetchDashboard();
-  }, [userId, token]);
+useEffect(() => {
+  if (!userId || !token) return;
+  fetchDashboard();
+}, [fetchDashboard, userId, token]);
 
   if (loading) return <LoadingSpinner message="Loading intelligence dashboard..." />;
   if (error) return <EmptyState message={error} />;
@@ -77,7 +78,7 @@ const FarmerDashboard = () => {
             const confirmDelete = window.confirm("Permanently delete your account?");
             if (!confirmDelete) return;
 
-            await fetch("http://localhost:8000/farmer/delete-account", {
+            await fetch("https://agroflow-backend-ghom.onrender.com/farmer/delete-account", {
               method: "DELETE",
               headers: { Authorization: `Bearer ${token}` },
             });
