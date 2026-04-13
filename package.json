@@ -28,8 +28,7 @@
       "react-app/jest"
     ],
     "rules": {
-      "react-hooks/exhaustive-deps": "off",
-      "build": "CI=false react-scripts build"
+      "react-hooks/exhaustive-deps": "off"
     }
   },
   "browserslist": {
