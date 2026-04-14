@@ -15,7 +15,7 @@ Automatically attaches JWT to requests
 ----------------------------------------
 */
 export const api = axios.create({
-  baseURL: "http://localhost:8000", // FastAPI backend
+  baseURL: "https://agroflow-backend-ghom.onrender.com",
 });
 
 /*
@@ -82,7 +82,7 @@ useEffect(() => {
   ----------------------------------------
   */
   const login = async (email, password) => {
-    const res = await axios.post("http://localhost:8000/login", null, {
+    const res = await axios.post("https://agroflow-backend-ghom.onrender.com/login", null, {
       params: { email, password },
     });
 
