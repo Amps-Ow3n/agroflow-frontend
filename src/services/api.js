@@ -8,7 +8,7 @@ Change baseURL if deploying later
 ---------------------------------------
 */
 const api = axios.create({
-  baseURL: "http://localhost:8000/",
+  baseURL: "https://agroflow-backend-ghom.onrender.com",
   headers: {
     "Content-Type": "application/json",
   },
