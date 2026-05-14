@@ -51,11 +51,21 @@ const OvercommitmentAlert = ({ overcommitments }) => {
                   <div className="fw-bold">
                     ⚠ {key}
                   </div>
+                  <div className="fw-semibold text-danger">
+  CRITICAL: Exceeds capacity by {(percent - 100).toFixed(1)}%
+</div>
 
-                  <div>
-                    {g.totalPromised} vs {g.capacity} ({percent.toFixed(1)}%)
-                  </div>
+<div className="small">
+  Capacity: {g.capacity}
+</div>
 
+<div className="small">
+  Total committed: {g.totalPromised}
+</div>
+
+<div className="small text-warning">
+  Recommended action: Reduce commitments or stagger delivery windows
+</div>
                   <div className="text-muted">
                     {g.items.join(", ")}
                   </div>

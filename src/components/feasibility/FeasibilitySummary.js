@@ -67,7 +67,7 @@ const FeasibilitySummary = ({ feasibility }) => {
                     <th>Week</th>
                     <th>Promised</th>
                     <th>Capacity</th>
-                    <th>Util%</th>
+                    <th>Operational Assessment</th>
                   </tr>
                 </thead>
 
@@ -96,7 +96,19 @@ const FeasibilitySummary = ({ feasibility }) => {
                           <td>{week}</td>
                           <td>{value.promised}</td>
                           <td>{value.capacity}</td>
-                          <td>{utilization.toFixed(1)}%</td>
+                          <td>
+  <div className="small">
+    {value.message}
+  </div>
+
+  <div
+    className={`fw-semibold ${
+      utilization > 1 ? "text-danger" : "text-success"
+    }`}
+  >
+    {utilization > 1 ? "HIGH RISK" : "FEASIBLE"}
+  </div>
+</td>
                         </tr>
                       );
                     }
@@ -121,7 +133,7 @@ const FeasibilitySummary = ({ feasibility }) => {
                   <th>Crop / Week</th>
                   <th>Promised</th>
                   <th>Capacity</th>
-                  <th>Util%</th>
+                  <th>Risk Signal</th>
                   <th>Details</th>
                 </tr>
               </thead>
@@ -150,16 +162,23 @@ const FeasibilitySummary = ({ feasibility }) => {
 
                       <td>{g.total}</td>
                       <td>{capacity}</td>
-                      <td>{utilization.toFixed(1)}%</td>
-
                       <td>
-                        <div className="small text-muted">
-                          {g.items.map((item, i) => (
-                            <div key={i}>
-                              {item.promised} {item.crop}
-                            </div>
-                          ))}
-                        </div>
+  <span
+    className={`fw-semibold ${
+      utilization > 1 ? "text-danger" : "text-success"
+    }`}
+  >
+    {utilization > 1 ? "HIGH" : "LOW"}
+  </span>
+</td>
+                      <td>
+                       <div className="small text-muted">
+  {g.items.map((item, i) => (
+    <div key={i}>
+      {item.message || `${item.promised} ${item.crop}`}
+    </div>
+  ))}
+</div>
                       </td>
                     </tr>
                   );
