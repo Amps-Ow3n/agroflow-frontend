@@ -103,10 +103,10 @@ const FeasibilitySummary = ({ feasibility }) => {
 
   <div
     className={`fw-semibold ${
-      utilization > 1 ? "text-danger" : "text-success"
+      utilization > 100 ? "text-danger" : "text-success"
     }`}
   >
-    {utilization > 1 ? "HIGH RISK" : "FEASIBLE"}
+    {utilization > 100 ? "HIGH RISK" : "FEASIBLE"}
   </div>
 </td>
                         </tr>
@@ -165,10 +165,10 @@ const FeasibilitySummary = ({ feasibility }) => {
                       <td>
   <span
     className={`fw-semibold ${
-      utilization > 1 ? "text-danger" : "text-success"
+      utilization > 100 ? "text-danger" : "text-success"
     }`}
   >
-    {utilization > 1 ? "HIGH" : "LOW"}
+    {utilization > 100 ? "HIGH" : "LOW"}
   </span>
 </td>
                       <td>
