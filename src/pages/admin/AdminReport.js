@@ -9,7 +9,7 @@ const AdminReport = () => {
     const fetchReport = async () => {
       try {
         const res = await api.get("/admin/report/term");
-        setReport(res.data.system_summary);
+        setReport(res.data);
       } catch (err) {
         console.error(err);
       }
@@ -35,31 +35,73 @@ const AdminReport = () => {
 
         <div className="col-6 col-md-4">
           <div className="text-muted">Supply</div>
-          <div className="fw-semibold">{report.total_supply}</div>
+          <div className="fw-semibold">{report.system_summary.total_supply}</div>
         </div>
 
         <div className="col-6 col-md-4">
           <div className="text-muted">Committed</div>
-          <div className="fw-semibold">{report.total_committed}</div>
+          <div className="fw-semibold">{report.system_summary.total_committed}</div>
         </div>
 
         <div className="col-6 col-md-4">
           <div className="text-muted">Delivered</div>
-          <div className="fw-semibold">{report.total_delivered}</div>
+          <div className="fw-semibold">{report.system_summary.total_delivered}</div>
         </div>
 
         <div className="col-6 col-md-4">
           <div className="text-muted">Fulfillment</div>
-          <div className="fw-semibold">{report.fulfillment_rate}%</div>
+          <div className="fw-semibold">{report.system_summary.fulfillment_rate}%</div>
         </div>
 
         <div className="col-6 col-md-4">
           <div className="text-muted">Overcommitment</div>
-          <div className="fw-semibold">{report.overcommitment}</div>
+          <div className="fw-semibold">{report.system_summary.overcommitment}</div>
+        </div>
+
+      </div>
+      
+      <div className="mt-4">
+
+  <h6 className="fw-semibold mb-3">
+    Farmer Risk Intelligence
+  </h6>
+
+  <div className="d-flex flex-column gap-2">
+
+    {report.farmer_performance?.map((farmer, idx) => (
+
+      <div
+        key={idx}
+        className="border rounded p-3 bg-light"
+      >
+
+        <div className="fw-semibold">
+          Farmer #{farmer.farmer_id}
+        </div>
+
+        <div
+          className={`small fw-semibold ${
+            farmer.risk_level === "HIGH"
+              ? "text-danger"
+              : farmer.risk_level === "MEDIUM"
+              ? "text-warning"
+              : "text-success"
+          }`}
+        >
+          {farmer.risk_level} Risk
+        </div>
+
+        <div className="small text-muted">
+          {farmer.message}
         </div>
 
       </div>
 
+    ))}
+
+  </div>
+
+</div>
     </div>
   );
 };
