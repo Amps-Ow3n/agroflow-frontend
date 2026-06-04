@@ -1,120 +1,132 @@
 import React, { useEffect, useState } from "react";
-import PageContainer from "../../components/layout/PageContainer";
-import LoadingSpinner from "../../components/ui/LoadingSpinner";
-import EmptyState from "../../components/ui/EmptyState";
+import PageContainer from "../../shared/components/PageContainer";
+import PageNav from "../../shared/components/PageNav";
+import LoadingSpinner from "../../shared/components/LoadingSpinner";
+import EmptyState from "../../shared/components/EmptyState";
 
-import SupplySummaryCard from "../../components/dashboard/SupplySummaryCard";
-import CommitmentSummaryCard from "../../components/dashboard/CommitmentSummaryCard";
-import DeliveryPerformanceCard from "../../components/dashboard/DeliveryPerformanceCard";
-import RiskAlertCard from "../../components/dashboard/RiskAlertCard";
-import ReliabilityScoreCard from "../../components/dashboard/ReliabilityScoreCard";
+import SupplySummaryCard from "../../shared/components/SupplySummaryCard";
+import CommitmentSummaryCard from "../../shared/components/CommitmentSummaryCard";
+import DeliverySummary from "../../shared/components/DeliverySummary";
+import FeasibilitySummary from "../../shared/components/FeasibilitySummary";
+import {
+    getAdminDashboard,
+    getAdminFeasibilitySummary
+} from "../../services/dashboardService";
 
-import { getAdminDashboard, getAdminFeasibilitySummary } from "../../services/dashboardService";
-import { useAuth } from "../../context/AuthContext";
-import { formatPercentage } from "../../utils/calculatePercentage";
-import PageNav from "../../components/navigation/PageNav";
+const AdminDashboard=()=>{
 
-const AdminDashboard = () => {
+const [dashboard,setDashboard]=useState(null);
+const [feasibility,setFeasibility]=useState(null);
+const [loading,setLoading]=useState(true);
+const [error,setError]=useState(null);
 
-  const { token } = useAuth();
+useEffect(()=>{
 
-  const [data, setData] = useState(null);
-  const [feasibility, setFeasibility] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+loadDashboard();
 
-  useEffect(() => {
+},[]);
 
-    const fetchDashboard = async () => {
-      setLoading(true);
+const loadDashboard=async()=>{
 
-      try {
-        const dashboard = await getAdminDashboard(token);
-        const feasibilityData = await getAdminFeasibilitySummary();
+setLoading(true);
 
-        setData(dashboard);
-        setFeasibility(feasibilityData);
+try{
 
-      } catch (err) {
-        setError(err.response?.data?.detail || "Failed to load dashboard");
-      } finally {
-        setLoading(false);
-      }
-    };
+const [dashboardData,feasibilityData]=
+await Promise.all([
+getAdminDashboard(),
+getAdminFeasibilitySummary()
+]);
 
-    fetchDashboard();
-  }, [token]);
+setDashboard(dashboardData);
+setFeasibility(feasibilityData);
 
-  if (loading) return <LoadingSpinner message="Loading system intelligence..." />;
-  if (error) return <EmptyState message={error} />;
-  if (!data) return <EmptyState message="No data available" />;
+}catch(err){
 
-  const systemDeliveryRate =
-    data.total_promised && data.total_delivered
-      ? formatPercentage(data.total_delivered, data.total_promised)
-      : null;
+setError(
+err.response?.data?.detail||
+"Failed to load dashboard"
+)
 
-  return (
-    <PageContainer title="System Intelligence Dashboard">
+}
+finally{
+setLoading(false)
+}
 
-      <PageNav sections={[
-        { id: "delivery", label: "Delivery" },
-        { id: "feasibility", label: "Feasibility" },
-        { id: "summary", label: "Summary" }
-      ]} />
+};
 
-      <p className="text-muted small mb-4">
-        Real-time system-wide intelligence across supply, delivery, and risk signals.
-      </p>
+if(loading)
+return(
+<LoadingSpinner message="Loading system intelligence..." />
+);
 
-      {systemDeliveryRate && (
-        <div id="delivery" className="alert alert-success small mb-4">
-          <strong>Delivery Rate:</strong> {systemDeliveryRate}
-        </div>
-      )}
+if(error)
+return(
+<EmptyState message={error}/>
+);
 
-      {feasibility && (
-        <div id="feasibility" className="card border-0 shadow-sm mb-4">
-          <div className="card-body">
-            <h6 className="fw-semibold mb-3">Feasibility Health</h6>
+return(
 
-            <div className="row g-2 small">
-              <div className="col-6 col-md-3"><strong>Farmers:</strong> {feasibility.total_farmers}</div>
-              <div className="col-6 col-md-3"><strong>Overcommitted:</strong> {feasibility.overcommitted_farmers}</div>
-              <div className="col-6 col-md-3"><strong>Overruns:</strong> {feasibility.total_overcommitments}</div>
-              <div className="col-6 col-md-3"><strong>Score:</strong> {(feasibility.system_feasibility_score * 100).toFixed(1)}%</div>
-            </div>
+<PageContainer
+title="System Intelligence Dashboard"
+interpretation="System-wide operational intelligence."
+>
 
-          </div>
-        </div>
-      )}
+<PageNav
+sections={[
+{id:"overview",label:"Overview"},
+{id:"feasibility",label:"Feasibility"}
+]}
+/>
 
-      <div id="summary" className="row g-3">
+<div
+id="overview"
+className="row g-3"
+>
 
-        <div className="col-12 col-md-6 col-xl-4">
-          <SupplySummaryCard data={data.supply_summary} />
-        </div>
+<div className="col-md-6">
 
-        <div className="col-12 col-md-6 col-xl-4">
-          <CommitmentSummaryCard data={data.commitment_summary} />
-        </div>
+<SupplySummaryCard
+data={dashboard?.supply_summary||[]}
+/>
 
-        <div className="col-12 col-md-6 col-xl-4">
-          <DeliveryPerformanceCard data={data.delivery_performance} />
-        </div>
+</div>
 
-        <div className="col-12 col-md-6 col-xl-4">
-          <RiskAlertCard alerts={data.risk_alerts} />
-        </div>
+<div className="col-md-6">
 
-        <div className="col-12 col-md-6 col-xl-4">
-          <ReliabilityScoreCard scores={data.reliability_scores} />
-        </div>
+<CommitmentSummaryCard
+data={dashboard?.commitment_summary||[]}
+/>
 
-      </div>
+</div>
 
-    </PageContainer>
-  );
+<div className="col-12">
+
+<DeliverySummary
+deliveries={
+dashboard?.delivery_performance||[]
+}
+/>
+
+</div>
+
+</div>
+
+<div
+id="feasibility"
+className="mt-4"
+>
+
+<FeasibilitySummary
+data={feasibility}
+/>
+
+</div>
+
+</PageContainer>
+
+)
+
 };
 
 export default AdminDashboard;
