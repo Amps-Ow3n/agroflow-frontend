@@ -1,0 +1,59 @@
+.nav-link {
+  transition: all 0.2s ease;
+  outline: none !important;
+}
+
+.nav-link:focus {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.nav-link:active {
+  background: transparent !important;
+}
+
+.nav-link.active {
+  background: white !important;
+  color: #166534 !important;
+  border-radius: 8px;
+}
+
+.sidebar-link {
+  color: white;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background: rgba(255,255,255,0.1);
+  color: white;
+}
+
+.sidebar-link:focus,
+.sidebar-link:active {
+  outline: none !important;
+  box-shadow: none !important;
+  color: white;
+}
+
+.sidebar-active {
+  background: white !important;
+  color: #166534 !important;
+  font-weight: 600;
+}
+
+.sidebar-active svg {
+  color: #166534 !important;
+}
+
+body {
+  background-color: #f8f9fa;
+}
+
+.auth-brand-panel {
+  min-height: 100vh;
+}
+
+.card {
+  border-radius: 14px;
+}
