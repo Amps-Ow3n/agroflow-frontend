@@ -42,8 +42,16 @@ export default function SupplierCommitmentsPage() {
         loadSources()
       ]);
     } catch (err) {
-      setError(err?.response?.data?.detail || err.message || "Failed to load data");
-    } finally {
+
+  const message =
+    err.response?.data?.detail ||
+    err.response?.data?.message ||
+    err.message ||
+    "Unable to load commitment information.";
+
+  setError(message);
+
+} finally {
       setLoading(false);
     }
   }

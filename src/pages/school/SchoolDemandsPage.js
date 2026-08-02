@@ -18,11 +18,15 @@ export default function SchoolDemandsPage() {
       setDemands(data);
 
     } catch (err) {
-      setError(
-        err?.response?.data?.detail ||
-        "Failed to load demands"
-      );
-    } finally {
+
+  const message =
+      err.response?.data?.detail ||
+      err.response?.data?.message ||
+      "Unable to load school demands.";
+
+  setError(message);
+
+} finally {
       setLoading(false);
     }
   }
@@ -33,7 +37,6 @@ export default function SchoolDemandsPage() {
 
   async function handleDelete(demandId) {
 
-
   const confirmed = window.confirm(
     "Are you sure you want to remove this demand?"
   );
@@ -43,11 +46,9 @@ export default function SchoolDemandsPage() {
     return;
   }
 
-
   try {
 
     await deleteDemand(demandId);
-
 
     setDemands(prev =>
       prev.filter(
@@ -58,10 +59,12 @@ export default function SchoolDemandsPage() {
 
   } catch (err) {
 
-    alert(
-      err?.response?.data?.detail ||
-      "Failed to delete demand."
-    );
+    const message =
+    err.response?.data?.detail ||
+    err.response?.data?.message ||
+    "Unable to delete demand.";
+
+    alert(message);
 
   }
 

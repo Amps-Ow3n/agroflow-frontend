@@ -11,7 +11,8 @@ import {
 
 import Loader from "../../components/common/Loader";
 import ErrorState from "../../components/common/ErrorState";
-
+import {getErrorMessage}
+from "../../utils/errorHandler";
 
 export default function SupplierSourcesPage() {
 
@@ -26,6 +27,7 @@ export default function SupplierSourcesPage() {
 
   const [actionError, setActionError] = useState("");
 
+  const [saving, setSaving] = useState(false);
 
 
   /*
@@ -57,15 +59,16 @@ export default function SupplierSourcesPage() {
       setSources(data);
 
 
-    } catch(err){
+    } catch (err) {
 
-      setError(
-        err?.response?.data?.detail ||
-        "Failed to load sources"
-      );
+  const message =
+    err.response?.data?.detail ||
+    err.response?.data?.message ||
+    "Unable to load supply sources. Please try again.";
 
+  setError(message);
 
-    } finally {
+} finally {
 
       setLoading(false);
 
@@ -73,16 +76,11 @@ export default function SupplierSourcesPage() {
 
   }
 
-
-
   useEffect(()=>{
 
     loadSources();
 
   },[]);
-
-
-
 
   /*
     Save edited source
@@ -104,6 +102,8 @@ export default function SupplierSourcesPage() {
 
     try {
 
+      setSaving(true);
+
       setActionError("");
 
       await updateSource(id,payload);
@@ -113,19 +113,22 @@ export default function SupplierSourcesPage() {
       await loadSources();
 
 
-    } catch(err){
+    } catch (err) {
 
-      setActionError(
-        err?.response?.data?.detail ||
-        "Failed to update source"
-      );
+  const message =
+    err.response?.data?.detail ||
+    err.response?.data?.message ||
+    "Unable to update supply source.";
 
-    }
+  setActionError(message);
 
+}
+finally {
+
+  setSaving(false);
+
+}
   }
-
-
-
 
   /*
     Delete is actually archive
@@ -148,6 +151,7 @@ export default function SupplierSourcesPage() {
 
 
     try {
+      setSaving(true);
 
       setActionError("");
 
@@ -156,20 +160,22 @@ export default function SupplierSourcesPage() {
       await loadSources();
 
 
-    }catch(err){
+    } catch (err) {
 
-      setActionError(
-        err?.response?.data?.detail ||
-        "Failed to delete source"
-      );
+  const message =
+      err.response?.data?.detail ||
+      err.response?.data?.message ||
+      "Unable to remove supply source.";
 
-    }
+  setActionError(message);
 
+}
+finally {
+
+  setSaving(false);
+
+}
   }
-
-
-
-
 
   if(loading)
 
@@ -177,16 +183,11 @@ export default function SupplierSourcesPage() {
       <Loader text="Loading supply sources..." />
     );
 
-
-
   if(error)
 
     return (
       <ErrorState message={error}/>
     );
-
-
-
 
   return (
 
@@ -294,6 +295,8 @@ export default function SupplierSourcesPage() {
 
             <SourceForm
 
+              saving={saving}
+              
               editingSource={editingSource}
 
               onSuccess={loadSources}

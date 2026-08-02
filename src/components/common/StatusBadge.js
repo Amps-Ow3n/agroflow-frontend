@@ -1,26 +1,26 @@
 import React from "react";
 
 export default function StatusBadge({ status }) {
+
   const map = {
-    FEASIBLE: "bg-green-100 text-green-700",
-    SHORTFALL: "bg-yellow-100 text-yellow-700",
-    UNFULFILLABLE: "bg-red-100 text-red-700",
+    FEASIBLE: "bg-success",
+    RELIABLE: "bg-success",
+    LOW: "bg-success",
 
-    RELIABLE: "bg-green-100 text-green-700",
-    MODERATE: "bg-yellow-100 text-yellow-700",
-    HIGH_RISK: "bg-red-100 text-red-700",
+    SHORTFALL: "bg-warning text-dark",
+    MODERATE: "bg-warning text-dark",
+    MEDIUM: "bg-warning text-dark",
 
-    LOW: "bg-green-100 text-green-700",
-    MEDIUM: "bg-yellow-100 text-yellow-700",
-    HIGH: "bg-red-100 text-red-700",
-    CRITICAL: "bg-red-200 text-red-900",
+    UNFULFILLABLE: "bg-danger",
+    HIGH_RISK: "bg-danger",
+    HIGH: "bg-danger",
+
+    CRITICAL: "bg-dark"
   };
 
   return (
     <span
-      className={`px-2 py-1 text-xs rounded font-medium ${
-        map[status] || "bg-gray-200 text-gray-700"
-      }`}
+      className={`badge ${map[status] || "bg-secondary"}`}
     >
       {status}
     </span>

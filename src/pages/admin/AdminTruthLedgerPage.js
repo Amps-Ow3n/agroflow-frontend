@@ -15,33 +15,43 @@ const [selected,setSelected]=useState(null);
 
 const [loading,setLoading]=useState(true);
 
+const [error, setError] = useState("");
 
+async function load() {
 
-async function load(){
+    try {
 
-setLoading(true);
+        setLoading(true);
+        setError("");
 
-const res=await client.get(
-"/dashboard/system/truth-ledger"
-);
+        const res = await client.get(
+            "/dashboard/system/truth-ledger"
+        );
 
-setDeliveries(res.data);
+        setDeliveries(res.data);
 
-setLoading(false);
+    } catch (err) {
+
+        const message =
+            err.response?.data?.detail ||
+            err.response?.data?.message ||
+            "Unable to load truth ledger.";
+
+        setError(message);
+
+    } finally {
+
+        setLoading(false);
+
+    }
 
 }
-
-
 
 useEffect(()=>{
 
 load();
 
 },[]);
-
-useEffect(() => {
-    console.log("Selected delivery:", selected);
-}, [selected]);
 
 async function saveCorrection(data){
 
@@ -57,13 +67,11 @@ load();
 
 }
 
+if (loading)
+    return <Loader text="Loading truth ledger" />;
 
-
-if(loading)
-
-return <Loader text="Loading truth ledger"/>
-
-
+if (error)
+    return <ErrorState message={error} />;
 
 return (
 

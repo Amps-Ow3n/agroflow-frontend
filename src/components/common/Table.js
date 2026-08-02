@@ -1,37 +1,84 @@
 import React from "react";
 
-/**
- * Type-C rule:
- * Table is a renderer, NOT a decision maker
- */
-export default function Table({ columns = [], data = [] }) {
+export default function Table({
+  columns = [],
+  data = []
+}) {
+
+  if (data.length === 0) {
+
+    return (
+
+      <div className="alert alert-light border">
+
+        No records found.
+
+      </div>
+
+    );
+
+  }
+
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full border">
-        <thead className="bg-gray-100">
+
+    <div className="table-responsive">
+
+      <table className="table table-bordered table-hover align-middle">
+
+        <thead className="table-light">
+
           <tr>
-            {columns.map((col, i) => (
-              <th key={i} className="text-left p-2 border-b">
+
+            {columns.map((col) => (
+
+              <th
+                key={col.accessor || col.header}
+              >
                 {col.header}
               </th>
+
             ))}
+
           </tr>
+
         </thead>
 
         <tbody>
-          {data.map((row, i) => (
-            <tr key={i} className="border-b">
-              {columns.map((col, j) => (
-                <td key={j} className="p-2">
+
+          {data.map((row) => (
+
+            <tr
+              key={
+                row.id ??
+                row.uuid ??
+                JSON.stringify(row)
+              }
+            >
+
+              {columns.map((col) => (
+
+                <td
+                  key={col.accessor || col.header}
+                >
+
                   {col.render
                     ? col.render(row)
                     : row[col.accessor]}
+
                 </td>
+
               ))}
+
             </tr>
+
           ))}
+
         </tbody>
+
       </table>
+
     </div>
+
   );
+
 }

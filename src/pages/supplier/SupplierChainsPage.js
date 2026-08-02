@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { getSupplierCommitments } from "../../api/commitmentApi";
-import client from "../../api/client";
 
 import Loader from "../../components/common/Loader";
 import ErrorState from "../../components/common/ErrorState";
 import ChainNode from "../../components/chains/ChainNode";
 import ChainValidationPanel from "../../components/chains/ChainValidationPanel";
-import { getChainFeasibility, getChainRisk } from "../../api/chainApi";
+import {
+    buildChain,
+    getChainFeasibility,
+    getChainRisk
+} from "../../api/chainApi";
 
 export default function SupplierChainsPage() {
   const [commitments, setCommitments] = useState([]);
@@ -33,7 +36,7 @@ export default function SupplierChainsPage() {
   }, []);
 
   // BUILD CHAIN (LOGIC UNCHANGED)
-  const buildChain = async (commitmentId) => {
+  const handleBuildChain  = async (commitmentId) => {
     if (!commitmentId) return;
 
     try {
@@ -41,18 +44,28 @@ export default function SupplierChainsPage() {
       setError("");
       setChain(null);
 
-      const res = await client.post(`/chain/build/${commitmentId}`);
-      setChain(res.data);
-      const [f, r] = await Promise.all([
-  client.get(`/chain/feasibility/${commitmentId}`),
-  client.get(`/chain/risk/${commitmentId}`)
-]);
+      const chainData = await buildChain(commitmentId);
 
-setFeasibility(f.data);
-setRisk(r.data);
+setChain(chainData);
+
+const [feasibilityData, riskData] =
+    await Promise.all([
+        getChainFeasibility(commitmentId),
+        getChainRisk(commitmentId)
+    ]);
+
+setFeasibility(feasibilityData);
+setRisk(riskData);
     } catch (err) {
-      setError(err?.response?.data?.detail || "Chain build failed");
-    } finally {
+
+    const message =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        "Unable to build procurement chain.";
+
+    setError(message);
+
+} finally {
       setLoading(false);
     }
   };
@@ -114,7 +127,7 @@ setRisk(r.data);
             {selected && (
               <button
                 className="btn btn-primary w-100 mt-3"
-                onClick={() => buildChain(selected)}
+                onClick={() => handleBuildChain(selected)}
                 disabled={loading}
               >
                 {loading ? "Building..." : "Build Allocation Chain"}

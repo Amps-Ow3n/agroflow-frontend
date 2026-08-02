@@ -59,14 +59,16 @@ export default function AdminCommitmentDetailPage() {
         }
 
 
-        catch(err){
+        catch (err) {
 
-            setError(
-                err?.response?.data?.detail ||
-                "Failed to load commitment."
-            );
+    const message =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        "Unable to load commitment.";
 
-        }
+    setError(message);
+
+}
 
 
         finally{
@@ -112,17 +114,16 @@ export default function AdminCommitmentDetailPage() {
 
         }
 
-        catch(err){
+        catch (err) {
 
-            setError(
+    const message =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        "Unable to save correction.";
 
-                err?.response?.data?.detail ||
-                "Correction failed."
+    setError(message);
 
-            );
-
-        }
-
+}
 
         finally{
 

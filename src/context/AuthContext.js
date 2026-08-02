@@ -22,12 +22,16 @@ export function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("role");
 
-    setToken(null);
-    setRole(null);
-  };
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("role");
+
+  setToken(null);
+  setRole(null);
+
+  window.location.href = "/login";
+
+};
 
   useEffect(() => {
     const storedToken = localStorage.getItem("access_token");

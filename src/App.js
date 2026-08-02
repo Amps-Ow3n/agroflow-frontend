@@ -31,6 +31,24 @@ import TruthAuditPage from "./pages/admin/TruthAuditPage";
 import AdminCommitmentDetailPage from "./pages/admin/AdminCommitmentDetailPage";
 import AdminTruthLedgerPage from "./pages/admin/AdminTruthLedgerPage";
 
+function ProtectedRoute({
+  children,
+  allowedRole,
+  isAuthenticated,
+  role
+}) {
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (role !== allowedRole) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
 function App() {
   const { role, isAuthenticated } = useContext(AuthContext);
 
@@ -63,7 +81,18 @@ function App() {
         {/* =========================
             SCHOOL
         ========================= */}
-       <Route path="/school" element={<SchoolLayout />}>
+       <Route
+  path="/school"
+  element={
+    <ProtectedRoute
+      allowedRole="school"
+      role={role}
+      isAuthenticated={isAuthenticated}
+    >
+      <SchoolLayout />
+    </ProtectedRoute>
+  }
+>
   <Route index element={<SchoolDashboardPage />} />
   <Route path="demands/new" element={<CreateSchoolDemandPage />} />
   <Route path="demands" element={<SchoolDemandsPage />} />
@@ -73,8 +102,18 @@ function App() {
         {/* =========================
     ADMIN (FIXED STRUCTURE)
 ========================= */}
-<Route path="/admin" element={<AdminLayout />}>
-
+<Route
+  path="/admin"
+  element={
+    <ProtectedRoute
+      allowedRole="admin"
+      role={role}
+      isAuthenticated={isAuthenticated}
+    >
+      <AdminLayout />
+    </ProtectedRoute>
+  }
+>
   {/* default admin page */}
   <Route index element={<AdminDashboardPage />} />
 
@@ -102,8 +141,18 @@ element={<AdminTruthLedgerPage />}
         {/* =========================
             SUPPLIER SYSTEM (FIXED)
         ========================= */}
-        <Route path="/supplier" element={<SupplierLayout />}>
-
+        <Route
+  path="/supplier"
+  element={
+    <ProtectedRoute
+      allowedRole="supplier"
+      role={role}
+      isAuthenticated={isAuthenticated}
+    >
+      <SupplierLayout />
+    </ProtectedRoute>
+  }
+>
           {/* index = default dashboard */}
           <Route index element={<SupplierDashboardPage />} />
 

@@ -1,17 +1,9 @@
-export function getErrorMessage(error) {
-  const detail = error?.response?.data?.detail;
+export function getErrorMessage(error){
 
-  if (Array.isArray(detail)) {
-    return detail.map(d => d.msg).join(", ");
-  }
+    return (
+        error?.response?.data?.message ||
+        error?.response?.data?.detail ||
+        "Something went wrong"
+    );
 
-  if (typeof detail === "string") {
-    return detail;
-  }
-
-  if (error?.message) {
-    return error.message;
-  }
-
-  return "Something went wrong";
 }

@@ -9,10 +9,18 @@ export default function Button({
   className = "",
 }) {
   const variants = {
-    primary: "btn btn-primary",
-    secondary: "btn btn-secondary",
-    danger: "btn btn-danger",
-  };
+
+  primary: "btn btn-primary",
+
+  secondary: "btn btn-secondary",
+
+  danger: "btn btn-danger",
+
+  success: "btn btn-success",
+
+  warning: "btn btn-warning"
+
+};
 
   return (
     <button
