@@ -184,7 +184,7 @@ export default function RegisterPage() {
                   name="password"
                   value={form.password}
                   onChange={handleChange}
-                  placeholder="Minimum 6 characters"
+                  placeholder="Minimum 8 characters"
                   type="password"
                 />
 
