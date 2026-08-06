@@ -8,6 +8,7 @@ export default function CreateSchoolDemandPage() {
   const [form, setForm] = useState({
     product: "",
     quantity: "",
+    location: "",
     delivery_start: "",
     delivery_end: ""
   });
@@ -75,7 +76,23 @@ export default function CreateSchoolDemandPage() {
       }
     />
   </div>
+<div className="mb-3">
+  <label className="form-label">
+    Delivery Location
+  </label>
 
+  <input
+    className="form-control"
+    placeholder="e.g. Gulu"
+    value={form.location}
+    onChange={(e)=>
+      setForm({
+        ...form,
+        location:e.target.value
+      })
+    }
+  />
+</div>
   <div className="row">
     <div className="col-6 mb-3">
       <label className="form-label">Start Date</label>
