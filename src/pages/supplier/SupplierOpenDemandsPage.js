@@ -58,13 +58,14 @@ export default function SupplierOpenDemandsPage() {
                 onClick={() =>
                   navigate("/supplier/commitments/new", {
                     state: {
-                      school_id: demand.school_id,
-                      product: demand.product,
-                      quantity: demand.quantity,
-                      delivery_start: demand.delivery_start,
-                      delivery_end: demand.delivery_end,
-                      locked: true
-                    },
+    demand_id: demand.id,
+    school_id: demand.school_id,
+    product: demand.product,
+    quantity: demand.quantity,
+    delivery_start: demand.delivery_start,
+    delivery_end: demand.delivery_end,
+    locked: true
+},
                   })
                 }
               >

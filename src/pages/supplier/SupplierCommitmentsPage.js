@@ -155,6 +155,7 @@ export default function SupplierCommitmentsPage() {
 
             <CommitmentForm
               schools={schools}
+              sources={sources}
               onSuccess={loadCommitments}
             />
           </div>

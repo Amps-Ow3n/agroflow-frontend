@@ -6,17 +6,19 @@ import Loader from "../common/Loader";
 import ErrorState from "../common/ErrorState";
 import { useLocation } from "react-router-dom";
 import CommitmentAnalysisCard from "./CommitmentAnalysisCard";
-export default function CommitmentForm({ schools, onSuccess }) {
+export default function CommitmentForm({ schools, sources, onSuccess }) {
   const location = useLocation();
   const demandData = location.state;
 
   const [form, setForm] = useState({
     school_id: demandData?.school_id || "",
+    demand_id: demandData?.demand_id || "",
+    source_id: "",
     product: demandData?.product || "",
     promised_qty: demandData?.quantity || "",
     delivery_start: demandData?.delivery_start || "",
     delivery_end: demandData?.delivery_end || "",
-  });
+});
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -121,6 +123,40 @@ analysis &&
           </div>
         )}
       </div>
+      
+      {/* SOURCE SELECT */}
+
+<div className="mb-3">
+
+<label className="form-label">
+Source
+</label>
+
+<select
+className="form-control"
+name="source_id"
+value={form.source_id}
+onChange={handleChange}
+>
+
+<option value="">
+Select Supply Source
+</option>
+
+{sources?.map((source)=>(
+
+<option
+key={source.id}
+value={source.id}
+>
+{source.product} - {source.qty_available} kg
+</option>
+
+))}
+
+</select>
+
+</div>
 
       {/* PRODUCT */}
       <Input
