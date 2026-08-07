@@ -10,11 +10,12 @@ export default function DemandEditForm({
 }) {
 
   const [form, setForm] = useState({
-    product: demand.product,
-    quantity: demand.quantity,
-    delivery_start: demand.delivery_start,
-    delivery_end: demand.delivery_end
-  });
+product: demand.product,
+quantity: demand.quantity,
+location: demand.location,
+delivery_start: demand.delivery_start,
+delivery_end: demand.delivery_end
+});
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -121,7 +122,21 @@ export default function DemandEditForm({
             />
 
           </div>
+          
+          <div className="mb-3">
 
+<label className="form-label">
+Location
+</label>
+
+<input
+className="form-control"
+name="location"
+value={form.location}
+onChange={handleChange}
+/>
+
+</div>
           <div className="row">
 
             <div className="col-md-6">
