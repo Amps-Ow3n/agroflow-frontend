@@ -18,8 +18,8 @@ export default function FailureDrillDownPage() {
       <h2>System Failures</h2>
 
       {failures.map(f => (
-        <div
-          key={f.commitment_id}
+  <div
+    key={f.delivery_id}
           onClick={() => openCommitment(f.commitment_id)}
           style={{
             border: "1px solid gray",
@@ -28,6 +28,7 @@ export default function FailureDrillDownPage() {
             cursor: "pointer"
           }}
         >
+          <p><b>Delivery:</b> {f.delivery_id}</p>
           <p><b>Commitment:</b> {f.commitment_id}</p>
           <p><b>Type:</b> {f.failure_type}</p>
           <p><b>Severity:</b> {f.severity}</p>

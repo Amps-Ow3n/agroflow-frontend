@@ -28,7 +28,6 @@ export default function DeliveryVerificationForm({
 
   async function handleSubmit(e) {
     e.preventDefault();
-console.log("COMMITMENT ID RECEIVED:", commitmentId);
 
     setLoading(true);
     setError("");
@@ -38,7 +37,6 @@ console.log("COMMITMENT ID RECEIVED:", commitmentId);
         ...form,
         received_qty: Number(form.received_qty),
       };
-console.log("PAYLOAD SENT:", payload);
       const result = await verifyDelivery(
         commitmentId,
         payload
