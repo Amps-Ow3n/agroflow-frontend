@@ -6,5 +6,17 @@ export const verifyDelivery = async (commitmentId, payload) => {
     payload
   );
 
-  return response.data.delivery; // ✅ IMPORTANT CHANGE
+  return response.data.delivery;
+};
+
+export const correctDeliveryVerification = async (
+  deliveryId,
+  payload
+) => {
+  const response = await client.put(
+    `/delivery/verification/${deliveryId}`,
+    payload
+  );
+
+  return response.data.delivery;
 };

@@ -8,8 +8,7 @@ export default function SchoolDeliveriesPage() {
   const [deliveries, setDeliveries] = useState([]);
   const [selected, setSelected] = useState(null);
   const [verificationResult, setVerificationResult] = useState(null);
-  const [editingVerification, setEditingVerification] = useState(null);
-
+  
   useEffect(() => {
   client.get("/school/deliveries")
     .then((res) => {
@@ -28,7 +27,8 @@ export default function SchoolDeliveriesPage() {
 };
 
 const handleVerificationCorrection = (delivery) => {
-  setEditingVerification(delivery);
+  setSelected(delivery);
+  setVerificationResult(null);
 };
 
   return (
@@ -96,7 +96,6 @@ const handleVerificationCorrection = (delivery) => {
   correctionMode={Boolean(selected.verification_status)}
   onVerified={(result) => {
     setVerificationResult(result);
-    setEditingVerification(null);
     loadDeliveries();
   }}
 />

@@ -13,7 +13,6 @@ export default function AdminCommitmentDetailPage() {
 
     const { id } = useParams();
 
-
     const [summary, setSummary] = useState(null);
 
     const [deliveries, setDeliveries] = useState([]);

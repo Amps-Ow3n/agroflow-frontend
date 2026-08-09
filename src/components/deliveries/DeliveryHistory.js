@@ -4,10 +4,17 @@ import DeliveryTruthCard from "./DeliveryTruthCard";
 import EmptyState from "../common/EmptyState";
 
 export default function DeliveryHistory({
+
   deliveries,
+
   mode = "school",
+
+  adminMode = false,
+
   onEdit,
+
   onDelete
+
 }) {
   if (!deliveries || deliveries.length === 0) {
     return (
@@ -22,12 +29,12 @@ export default function DeliveryHistory({
     <div className="d-flex flex-column gap-3">
       {deliveries.map((delivery) => (
         <DeliveryTruthCard
-          key={delivery.id}
-          delivery={delivery}
-          mode={mode}
-          onEdit={onEdit}
-          onDelete={onDelete}
-        />
+  key={delivery.id}
+  delivery={delivery}
+  mode={adminMode ? "admin" : mode}
+  onEdit={onEdit}
+  onDelete={onDelete}
+/>
       ))}
     </div>
   );

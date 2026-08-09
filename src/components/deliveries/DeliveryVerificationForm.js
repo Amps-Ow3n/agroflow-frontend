@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { verifyDelivery } from "../../api/deliveryApi";
-
+import {
+  verifyDelivery,
+  correctDeliveryVerification
+} from "../../api/deliveryApi";
 import Button from "../common/Button";
 import Loader from "../common/Loader";
 import ErrorState from "../common/ErrorState";
@@ -41,7 +43,12 @@ export default function DeliveryVerificationForm({
       received_qty: Number(form.received_qty),
     };
 
-    const result = await verifyDelivery(
+    const result = correctionMode
+  ? await correctDeliveryVerification(
+      delivery.id,
+      payload
+    )
+  : await verifyDelivery(
       commitmentId,
       payload
     );
@@ -50,18 +57,24 @@ export default function DeliveryVerificationForm({
       onVerified(result);
     }
   } catch (err) {
+    console.error("Verification failed:", err);
+
     const detail = err?.response?.data?.detail;
 
     if (Array.isArray(detail)) {
-      setError(
-        detail.map((e) => e.msg).join(", ")
-      );
+        setError(
+            detail
+                .map((e) => e.msg || e.message)
+                .join(", ")
+        );
+    } else if (typeof detail === "string") {
+        setError(detail);
+    } else if (detail?.message) {
+        setError(detail.message);
     } else {
-      setError(
-        detail || "Verification failed"
-      );
+        setError("Verification failed");
     }
-  } finally {
+} finally {
     setLoading(false);
   }
 }
@@ -165,15 +178,22 @@ export default function DeliveryVerificationForm({
       </div>
 
       {loading ? (
-        <Loader text="Verifying..." />
+        <Loader
+  text={
+    correctionMode
+      ? "Saving verification correction..."
+      : "Verifying..."
+  }
+/>
       ) : (
-        <Button
-          type="submit"
-          className="w-100"
-        >
-          Submit Verification
-        </Button>
-      )}
+<Button
+  type="submit"
+  className="w-100"
+>
+  {correctionMode
+    ? "Save Verification Correction"
+    : "Submit Verification"}
+</Button>      )}
     </form>
   );
 }
