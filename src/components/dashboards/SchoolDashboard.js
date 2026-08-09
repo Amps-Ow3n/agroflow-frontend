@@ -106,8 +106,9 @@ export default function SchoolDashboard() {
 
         <div className="col-12 col-md-6 col-xl-3">
           <SupplierTrustPanel
-            trustScore={data.supplier_trust_avg}
-          />
+    trustScore={data.supplier_trust_avg}
+    trustConfidence={data.supplier_trust_confidence}
+/>
         </div>
 
       </div>

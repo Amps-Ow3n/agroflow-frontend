@@ -1,108 +1,187 @@
 import React, { useEffect, useState } from "react";
 
 import {
-  getSupplierDashboard
+    getSupplierDashboard
 } from "../api/dashboardApi";
 
 import StatusBadge from "../components/common/StatusBadge";
-import Loader from "../components/common/Loader";
-import ErrorState from "../components/common/ErrorState";
 
-export default function SupplierTrustPanel() {
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+export default function SupplierTrustPanel({
+    trustScore = null,
+    trustConfidence = null
+}) {
 
-  useEffect(() => {
-    async function loadDashboard() {
-      try {
-        const response = await getSupplierDashboard();
+    const [data, setData] = useState(null);
+    const [loading, setLoading] = useState(
+        trustScore === null
+    );
+    const [error, setError] = useState("");
 
-        setData(response);
-      } catch (error) {
-        console.error(
-          "Supplier trust loading failed",
-          error
+    /*
+     * SCHOOL CONTEXT
+     *
+     * If the school dashboard supplies trust data,
+     * use that data directly.
+     *
+     * Do NOT call /dashboard/supplier/overview.
+     */
+    useEffect(() => {
+
+        if (trustScore !== null) {
+
+            setData({
+                reliability_score: trustScore,
+                reliability_confidence:
+                    trustConfidence || "UNKNOWN"
+            });
+
+            setLoading(false);
+            setError("");
+
+            return;
+        }
+
+        /*
+         * SUPPLIER CONTEXT
+         *
+         * Only suppliers without supplied trust data
+         * fetch their own supplier dashboard.
+         */
+        async function loadDashboard() {
+
+            try {
+
+                const response =
+                    await getSupplierDashboard();
+
+                setData(response);
+
+            } catch (error) {
+
+                console.error(
+                    "Supplier trust loading failed",
+                    error
+                );
+
+                setError(
+                    error?.response?.data?.detail ||
+                    "Unable to load supplier trust data."
+                );
+
+            } finally {
+
+                setLoading(false);
+
+            }
+        }
+
+        loadDashboard();
+
+    }, [trustScore, trustConfidence]);
+
+
+    if (loading) {
+
+        return (
+            <div className="card shadow-sm border-0 h-100">
+                <div className="card-body">
+                    Loading supplier trust...
+                </div>
+            </div>
         );
 
-        setError(
-          error?.response?.data?.detail ||
-          "Unable to load supplier trust data."
-        );
-      } finally {
-        setLoading(false);
-      }
     }
 
-    loadDashboard();
-  }, []);
 
-  if (loading) {
+    if (error) {
+
+        return (
+            <div className="card shadow-sm border-0 h-100">
+                <div className="card-body">
+                    <div className="text-danger">
+                        {error}
+                    </div>
+                </div>
+            </div>
+        );
+
+    }
+
+
+    if (!data) {
+        return null;
+    }
+
+
+    const score =
+        Number(
+            data.reliability_score ??
+            data.supplier_trust_avg ??
+            0
+        );
+
+
+    const confidence =
+        data.reliability_confidence ??
+        data.supplier_trust_confidence ??
+        "UNKNOWN";
+
+
+    const trustStatus =
+        score >= 80
+            ? "TRUSTED"
+            : score >= 60
+                ? "MODERATE"
+                : "LOW_TRUST";
+
+
+    const confidenceLabel =
+        confidence === "STABLE"
+            ? "Stable evidence"
+            : confidence === "LOW_SAMPLE"
+                ? "Low sample warning"
+                : confidence === "LOW_SAMPLE_WARNING"
+                    ? "Low sample warning"
+                    : confidence === "NO_DATA"
+                        ? "No verified history"
+                        : confidence;
+
+
     return (
-      <div className="card shadow-sm p-3">
-        <Loader text="Loading supplier trust..." />
-      </div>
+
+        <div className="card shadow-sm border-0 h-100">
+
+            <div className="card-body">
+
+                <h5 className="fw-bold">
+                    Supplier Trust
+                </h5>
+
+                <h2 className="mt-3">
+                    {score.toFixed(1)}%
+                </h2>
+
+                <div className="mt-2">
+                    <StatusBadge
+                        status={trustStatus}
+                    />
+                </div>
+
+                <div className="mt-3">
+
+                    <small className="text-muted d-block">
+                        Evidence confidence
+                    </small>
+
+                    <strong>
+                        {confidenceLabel}
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
     );
-  }
-
-  if (error) {
-    return (
-      <ErrorState message={error} />
-    );
-  }
-
-  if (!data) {
-    return null;
-  }
-
-  const trustScore =
-    data.reliability_score ?? 0;
-
-  const confidence =
-    data.reliability_confidence ??
-    "unknown";
-
-  const trustStatus =
-    trustScore >= 80
-      ? "TRUSTED"
-      : trustScore >= 60
-      ? "MODERATE"
-      : "LOW_TRUST";
-
-  const confidenceLabel =
-    confidence === "stable"
-      ? "Stable evidence"
-      : confidence === "low_sample_warning"
-      ? "Low sample warning"
-      : confidence;
-
-  return (
-    <div className="card shadow-sm p-3">
-
-      <h5 className="fw-bold">
-        Supplier Trust
-      </h5>
-
-      <h2 className="mt-3">
-        {trustScore}%
-      </h2>
-
-      <div className="mt-2">
-        <StatusBadge status={trustStatus} />
-      </div>
-
-      <div className="mt-3">
-
-        <small className="text-muted d-block">
-          Evidence confidence
-        </small>
-
-        <strong>
-          {confidenceLabel}
-        </strong>
-
-      </div>
-
-    </div>
-  );
 }
