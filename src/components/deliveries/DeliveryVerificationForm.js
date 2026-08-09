@@ -30,52 +30,41 @@ export default function DeliveryVerificationForm({
   }
 
   async function handleSubmit(e) {
-    e.preventDefault();
+  e.preventDefault();
 
-    setLoading(true);
-    setError("");
-    
-    try {
-      const payload = {
-        ...form,
-        received_qty: Number(form.received_qty),
-      };
-      const deliveredQty = Number(
-  delivery?.delivered_qty ?? Infinity
-);
+  setLoading(true);
+  setError("");
 
-if (receivedQty > deliveredQty) {
-  setError(
-    "Received quantity cannot exceed the supplier's delivered quantity."
-  );
-  setLoading(false);
-  return;
-}
-      const result = await verifyDelivery(
-        commitmentId,
-        payload
-      );
+  try {
+    const payload = {
+      ...form,
+      received_qty: Number(form.received_qty),
+    };
 
-      if (onVerified) {
-        onVerified(result);
-      }
-    } 
-    catch (err) {
-      const detail = err?.response?.data?.detail;
+    const result = await verifyDelivery(
+      commitmentId,
+      payload
+    );
 
-      if (Array.isArray(detail)) {
-        setError(
-          detail.map((e) => e.msg).join(", ")
-        );
-      } else {
-        setError(
-          detail || "Verification failed"
-        );
-      }
-    } finally {
-      setLoading(false);
+    if (onVerified) {
+      onVerified(result);
     }
+  } catch (err) {
+    const detail = err?.response?.data?.detail;
+
+    if (Array.isArray(detail)) {
+      setError(
+        detail.map((e) => e.msg).join(", ")
+      );
+    } else {
+      setError(
+        detail || "Verification failed"
+      );
+    }
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <form
