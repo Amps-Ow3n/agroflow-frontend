@@ -160,16 +160,40 @@ setRisk(riskData);
 
                 <div className="row">
                   <div className="col-md-6">
-                    <div>Status: <b>{chain.status}</b></div>
-                    <div>Promised: {chain.promised_qty} kg</div>
-                    <div>Allocated: {chain.allocated_qty} kg</div>
-                    <div>Shortfall: {chain.shortfall} kg</div>
-                  </div>
+  <div className="text-muted small">
+    Fulfillment Status
+  </div>
 
-                  <div className="col-md-6">
-                    <div>Risk Level: {chain.risk?.risk_level}</div>
-                    <div>Chain Hops: {chain.risk?.hops}</div>
-                  </div>
+  <div className="fw-bold">
+    {chain.status || "UNKNOWN"}
+  </div>
+
+  <div className="mt-2">
+    Promised: {chain.promised_qty} kg
+  </div>
+
+  <div>
+    Allocated: {chain.allocated_qty} kg
+  </div>
+
+  <div>
+    Shortfall: {chain.shortfall} kg
+  </div>
+</div>
+
+<div className="col-md-6">
+  <div className="text-muted small">
+    Structural Risk
+  </div>
+
+  <div className="fw-bold">
+    {chain.risk?.risk_level || "UNKNOWN"}
+  </div>
+
+  <div className="mt-2">
+    Chain Hops: {chain.risk?.hops ?? 0}
+  </div>
+</div>
                 </div>
               </div>
               {/* STEP 8 — VALIDATION ENGINE OUTPUT */}

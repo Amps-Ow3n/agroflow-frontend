@@ -7,8 +7,11 @@ import ErrorState from "../common/ErrorState";
 
 export default function DeliveryVerificationForm({
   commitmentId,
+  delivery = null,
   onVerified,
+  correctionMode = false
 }) {
+
   const [form, setForm] = useState({
     received_qty: "",
     verification_status: "VERIFIED",
@@ -37,6 +40,17 @@ export default function DeliveryVerificationForm({
         ...form,
         received_qty: Number(form.received_qty),
       };
+      const deliveredQty = Number(
+  delivery?.delivered_qty ?? Infinity
+);
+
+if (receivedQty > deliveredQty) {
+  setError(
+    "Received quantity cannot exceed the supplier's delivered quantity."
+  );
+  setLoading(false);
+  return;
+}
       const result = await verifyDelivery(
         commitmentId,
         payload
@@ -69,7 +83,9 @@ export default function DeliveryVerificationForm({
       className="p-4 border rounded bg-white"
     >
       <h5 className="fw-bold mb-3">
-        Verify Delivery
+        {correctionMode
+  ? "Correct Delivery Verification"
+  : "Verify Delivery"}
       </h5>
 
       {error && (

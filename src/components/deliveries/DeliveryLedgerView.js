@@ -1,7 +1,7 @@
 import React from "react";
 import DeliveryTruthCard from "./DeliveryTruthCard";
 
-export default function DeliveryLedgerView({ deliveries }) {
+export default function DeliveryLedgerView({ deliveries, mode = "supplier", onEdit, onDelete }) {
   const grouped = deliveries.reduce((acc, d) => {
     const key = `${d.week_start} → ${d.week_end}`;
     if (!acc[key]) acc[key] = [];
@@ -27,7 +27,13 @@ export default function DeliveryLedgerView({ deliveries }) {
 
           <div className="d-flex flex-column gap-2">
             {items.map((d) => (
-              <DeliveryTruthCard key={d.id} delivery={d} />
+              <DeliveryTruthCard
+  key={d.id}
+  delivery={d}
+  mode={mode}
+  onEdit={onEdit}
+  onDelete={onDelete}
+/>
             ))}
           </div>
 

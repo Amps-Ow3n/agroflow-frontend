@@ -8,12 +8,11 @@ export default function SchoolDeliveriesPage() {
   const [deliveries, setDeliveries] = useState([]);
   const [selected, setSelected] = useState(null);
   const [verificationResult, setVerificationResult] = useState(null);
+  const [editingVerification, setEditingVerification] = useState(null);
 
   useEffect(() => {
   client.get("/school/deliveries")
     .then((res) => {
-
-      console.log("DELIVERIES FROM BACKEND:", res.data);
 
       setDeliveries(res.data);
 
@@ -26,6 +25,10 @@ export default function SchoolDeliveriesPage() {
 
     setDeliveries(res.data);
 
+};
+
+const handleVerificationCorrection = (delivery) => {
+  setEditingVerification(delivery);
 };
 
   return (
@@ -88,15 +91,15 @@ export default function SchoolDeliveriesPage() {
               </p>
             ) : (
               <DeliveryVerificationForm
-                commitmentId={selected.commitment_id}
-                onVerified={(result)=>{
-
-        setVerificationResult(result);
-
-        loadDeliveries();
-
-    }}
-              />
+  commitmentId={selected.commitment_id}
+  delivery={selected}
+  correctionMode={Boolean(selected.verification_status)}
+  onVerified={(result) => {
+    setVerificationResult(result);
+    setEditingVerification(null);
+    loadDeliveries();
+  }}
+/>
             )}
           </div>
         </div>
@@ -122,7 +125,11 @@ export default function SchoolDeliveriesPage() {
       <div className="mt-4">
         <div className="card shadow-sm border-0 p-3">
           <h6 className="fw-bold mb-3">Delivery Ledger</h6>
-          <DeliveryHistory deliveries={deliveries} />
+          <DeliveryHistory
+  deliveries={deliveries}
+  mode="school"
+  onEdit={handleVerificationCorrection}
+/>
         </div>
       </div>
 

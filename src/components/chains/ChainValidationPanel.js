@@ -57,9 +57,25 @@ export default function ChainValidationPanel({
         <h6 className="fw-bold">System Interpretation</h6>
 
         <p className="text-muted small mb-0">
-          {feasibility?.feasible
-            ? "System confirms supply capacity can satisfy commitment constraints."
-            : "System detects supply constraint violations or timing conflicts."}
+          <div className="mt-3 p-3 border rounded bg-white">
+  <h6 className="fw-bold">
+    System Interpretation
+  </h6>
+
+  <p className="text-muted small mb-2">
+    {feasibility?.feasible
+      ? "Fulfillment analysis indicates that the available allocation can satisfy the commitment constraints."
+      : "Fulfillment analysis detects a quantity, capacity, or timing constraint affecting the commitment."}
+  </p>
+
+  {risk?.risk_level && (
+    <p className="text-muted small mb-0">
+      Structural risk is assessed separately from fulfillment.
+      Current chain risk:
+      <strong> {risk.risk_level}</strong>.
+    </p>
+  )}
+</div>
         </p>
       </div>
 
