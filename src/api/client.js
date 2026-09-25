@@ -1,22 +1,36 @@
 import axios from "axios";
 
-const client = axios.create({
-  baseURL: process.env.REACT_APP_API_BASE_URL || "https://agroflow-backend-ghom.onrender.com",
-  withCredentials: true,
-  headers: { "Content-Type": "application/json" },
-});
+let csrfToken = null;
 
-function getCookie(name) {
-  const prefix = `${name}=`;
-  const found = document.cookie.split("; ").find((row) => row.startsWith(prefix));
-  return found ? decodeURIComponent(found.substring(prefix.length)) : null;
+export function setCsrfToken(token) {
+  csrfToken = token || null;
 }
 
+export function clearCsrfToken() {
+  csrfToken = null;
+}
+
+const client = axios.create({
+  baseURL:
+    process.env.REACT_APP_API_BASE_URL ||
+    "https://agroflow-backend-ghom.onrender.com",
+  withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 client.interceptors.request.use((config) => {
-  const csrf = getCookie("agroflow_csrf");
-  if (csrf && !["get", "head", "options"].includes((config.method || "get").toLowerCase())) {
-    config.headers["X-CSRF-Token"] = csrf;
+  const method = (config.method || "get").toLowerCase();
+
+  if (
+    csrfToken &&
+    !["get", "head", "options"].includes(method)
+  ) {
+    config.headers = config.headers || {};
+    config.headers["X-CSRF-Token"] = csrfToken;
   }
+
   return config;
 });
 
