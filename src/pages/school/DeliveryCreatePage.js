@@ -24,57 +24,99 @@ export default function DeliveryCreatePage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    Promise.all([
-      getProcurement(id),
-      getProcurementCommitment(id),
-    ])
-      .then(([a, b]) => {
-        setP(a);
-        setC(b);
-      })
-      .catch((e) => setError(getApiError(e)));
+    async function load() {
+      try {
+        const [procurement, commitmentResponse] =
+          await Promise.all([
+            getProcurement(id),
+            getProcurementCommitment(id),
+          ]);
+
+        setP(procurement);
+
+        const commitmentList =
+          Array.isArray(commitmentResponse)
+            ? commitmentResponse
+            : commitmentResponse
+              ? [commitmentResponse]
+              : [];
+
+        const acceptedCommitment =
+          commitmentList.find(
+            (item) => item.status === "ACCEPTED"
+          );
+
+        setC(acceptedCommitment || null);
+      } catch (e) {
+        setError(getApiError(e));
+      }
+    }
+
+    load();
   }, [id]);
 
   const items = p?.items || [];
 
-  function setItem(id, v) {
+  function setItem(itemId, value) {
     setQty((q) => ({
       ...q,
-      [id]: v,
+      [itemId]: value,
     }));
   }
 
   async function submit(e) {
     e.preventDefault();
     setBusy(true);
+    setError("");
 
     try {
       await recordDelivery({
-        commitment_id: Number(c?.id || c?.commitment_id),
+        commitment_id: Number(
+          c?.id || c?.commitment_id
+        ),
         delivery_date: date,
         condition,
         notes: notes || null,
         lines: items.map((i) => ({
           procurement_item_id: i.id,
-          actual_quantity: Number(qty[i.id] || 0),
+          actual_quantity: Number(
+            qty[i.id] || 0
+          ),
         })),
       });
 
       nav(`/school/procurements/${id}`);
     } catch (e) {
       setError(
-        getApiError(e, "Unable to record delivery.")
+        getApiError(
+          e,
+          "Unable to record delivery."
+        )
       );
     } finally {
       setBusy(false);
     }
   }
 
-  if (!p || !c) {
+  if (!p) {
     return (
       <Page title="Record delivery">
         <Loading />
+
         {error && <Alert>{error}</Alert>}
+      </Page>
+    );
+  }
+
+  if (!c) {
+    return (
+      <Page title="Record delivery">
+        <Alert>
+          No accepted supplier commitment exists for
+          this procurement. A delivery can only be
+          recorded after the supplier commitment has
+          been accepted.
+        </Alert>
       </Page>
     );
   }
@@ -91,8 +133,8 @@ export default function DeliveryCreatePage() {
         {error && <Alert>{error}</Alert>}
 
         <div className="alert alert-info">
-          Commitment #{c.id || c.commitment_id} · promised{" "}
-          {c.promised_qty}
+          Commitment #{c.id || c.commitment_id} ·
+          promised {c.promised_qty}
         </div>
 
         <label
@@ -107,7 +149,9 @@ export default function DeliveryCreatePage() {
           className="form-control mb-3"
           type="date"
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={(e) =>
+            setDate(e.target.value)
+          }
           required
         />
 
@@ -120,7 +164,8 @@ export default function DeliveryCreatePage() {
               htmlFor={`actual_quantity_${i.id}`}
               className="form-label"
             >
-              {i.item_name || i.description} — actual quantity
+              {i.item_name || i.description} —
+              actual quantity
             </label>
 
             <input
@@ -131,7 +176,10 @@ export default function DeliveryCreatePage() {
               step="0.01"
               value={qty[i.id] || ""}
               onChange={(e) =>
-                setItem(i.id, e.target.value)
+                setItem(
+                  i.id,
+                  e.target.value
+                )
               }
               required
             />
@@ -149,7 +197,9 @@ export default function DeliveryCreatePage() {
           id="condition"
           className="form-control mb-3"
           value={condition}
-          onChange={(e) => setCondition(e.target.value)}
+          onChange={(e) =>
+            setCondition(e.target.value)
+          }
           required
         />
 
@@ -164,14 +214,18 @@ export default function DeliveryCreatePage() {
           id="delivery_notes"
           className="form-control"
           value={notes}
-          onChange={(e) => setNotes(e.target.value)}
+          onChange={(e) =>
+            setNotes(e.target.value)
+          }
         />
 
         <button
           className="btn btn-dark mt-3"
           disabled={busy}
         >
-          {busy ? "Recording…" : "Record delivery"}
+          {busy
+            ? "Recording…"
+            : "Record delivery"}
         </button>
       </form>
     </Page>
