@@ -14,7 +14,6 @@ import {
 
 export const AuthContext = createContext(null);
 
-
 function getVerifiedMemberships(identity) {
 
   return (identity?.memberships || []).filter(
@@ -48,6 +47,23 @@ function getRejectedMemberships(identity) {
   );
 }
 
+function hasResponsibility(
+  identity,
+  responsibilityCode
+) {
+  return (identity?.memberships || []).some(
+    (membership) =>
+      membership?.status === "ACTIVE" &&
+      membership?.organization?.status === "ACTIVE" &&
+      membership?.organization?.verification_status ===
+        "VERIFIED" &&
+      (membership?.responsibilities || []).some(
+        (responsibility) =>
+          responsibility?.code ===
+          responsibilityCode
+      )
+  );
+}
 
 function deriveWorkspace(identity) {
 
@@ -154,45 +170,62 @@ export function AuthProvider({
       );
 
     return {
+  identity,
 
+  user:
+    identity?.user || null,
 
+  memberships,
+
+  verifiedMemberships,
+
+  pendingMemberships,
+
+  rejectedMemberships,
+
+  workspace:
+    deriveWorkspace(identity),
+
+  isSystemAdmin:
+    identity?.user?.is_system_admin === true,
+
+  isOrganizationAdmin:
+    hasResponsibility(
       identity,
+      "ORGANIZATION_ADMIN"
+    ),
 
-      user:
-        identity?.user || null,
+  isSupplierAdmin:
+    hasResponsibility(
+      identity,
+      "SUPPLIER_ADMIN"
+    ),
 
-      memberships,
+  hasResponsibility:
+    (responsibilityCode) =>
+      hasResponsibility(
+        identity,
+        responsibilityCode
+      ),
 
-      verifiedMemberships,
+  isAuthenticated:
+    Boolean(authenticated && identity),
 
-      pendingMemberships,
+  hasVerifiedOrganization:
+    verifiedMemberships.length > 0,
 
-      rejectedMemberships,
+  hasPendingVerification:
+    pendingMemberships.length > 0,
 
-      workspace:
-        deriveWorkspace(identity),
+  hasRejectedVerification:
+    rejectedMemberships.length > 0,
 
-      isSystemAdmin:
-        identity?.user?.is_system_admin === true,
+  loading,
 
-      isAuthenticated:
-        Boolean(authenticated && identity),
+  login,
 
-      hasVerifiedOrganization:
-        verifiedMemberships.length > 0,
-
-      hasPendingVerification:
-        pendingMemberships.length > 0,
-
-      hasRejectedVerification:
-        rejectedMemberships.length > 0,
-
-      loading,
-
-      login,
-
-      logout,
-    };
+  logout,
+};
 
   }, [
     authenticated,

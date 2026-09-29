@@ -1,26 +1,44 @@
 import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const links = {
+const baseLinks = {
   school: [
     ["/school", "Dashboard"],
     ["/school/procurements", "Procurements"],
     ["/school/procurements/new", "New Procurement"],
   ],
+
   supplier: [
     ["/supplier", "Dashboard"],
     ["/supplier/commitments", "Commitments"],
     ["/supplier/profile", "Supplier Profile"],
   ],
+
   admin: [
     ["/admin", "System Overview"],
   ],
 };
 
 export default function WorkspaceLayout({ type }) {
-  const { user, logout } = useAuth();
+  const { user, logout, isOrganizationAdmin, isSupplierAdmin } = useAuth();
   const navigate = useNavigate();
-  const nav = links[type] || [];
+  const nav = [
+  ...(baseLinks[type] || []),
+];
+
+if (
+  (type === "school" && isOrganizationAdmin) ||
+  (type === "supplier" && isSupplierAdmin) ||
+  (type === "supplier" && isOrganizationAdmin) ||
+  (type === "school" && isOrganizationAdmin)
+) {
+  nav.push([
+    type === "supplier"
+      ? "/supplier/organization"
+      : "/school/organization",
+    "Organization",
+  ]);
+}
 
   return (
     <div className="d-flex min-vh-100 bg-light">
