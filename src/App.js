@@ -3,8 +3,146 @@ import{BrowserRouter,Routes,Route,Navigate}from"react-router-dom";import{useAuth
 
 import OrganizationMembersPage
   from "./pages/organization/OrganizationMembersPage";
-function Guard({type,children}){const{isAuthenticated,workspace,loading}=useAuth();if(loading)return <div className="p-5">Loading…</div>;if(!isAuthenticated)return <Navigate to="/login" replace/>;if(workspace!==type)return <Navigate to="/" replace/>;return children;}
-function Home(){const{isAuthenticated,workspace,loading}=useAuth();if(loading)return <div className="p-5">Loading…</div>;if(!isAuthenticated)return <Navigate to="/login" replace/>;if(workspace==="school")return <Navigate to="/school" replace/>;if(workspace==="supplier")return <Navigate to="/supplier" replace/>;if(workspace==="admin")return <Navigate to="/admin" replace/>;return <div className="p-5">Multiple organizations are active. Organization selection is required.</div>}
+import OrganizationSelectionPage
+  from "./pages/auth/OrganizationSelectionPage";
+function Guard({
+  type,
+  children,
+}) {
+
+  const {
+    isAuthenticated,
+    workspace,
+    verifiedMemberships,
+    activeOrganizationId,
+    loading,
+  } = useAuth();
+
+
+  if (loading) {
+    return (
+      <div className="p-5">
+        Loading…
+      </div>
+    );
+  }
+
+
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+  }
+
+
+  if (
+    verifiedMemberships.length > 1 &&
+    !activeOrganizationId
+  ) {
+    return (
+      <Navigate
+        to="/select-organization"
+        replace
+      />
+    );
+  }
+
+
+  if (workspace !== type) {
+    return (
+      <Navigate
+        to="/"
+        replace
+      />
+    );
+  }
+
+
+  return children;
+}
+
+function Home() {
+
+  const {
+    isAuthenticated,
+    workspace,
+    verifiedMemberships,
+    activeOrganizationId,
+    loading,
+  } = useAuth();
+
+
+  if (loading) {
+    return (
+      <div className="p-5">
+        Loading…
+      </div>
+    );
+  }
+
+
+  if (!isAuthenticated) {
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
+  }
+
+
+  if (
+    verifiedMemberships.length > 1 &&
+    !activeOrganizationId
+  ) {
+    return (
+      <Navigate
+        to="/select-organization"
+        replace
+      />
+    );
+  }
+
+
+  if (workspace === "school") {
+    return (
+      <Navigate
+        to="/school"
+        replace
+      />
+    );
+  }
+
+
+  if (workspace === "supplier") {
+    return (
+      <Navigate
+        to="/supplier"
+        replace
+      />
+    );
+  }
+
+
+  if (workspace === "admin") {
+    return (
+      <Navigate
+        to="/admin"
+        replace
+      />
+    );
+  }
+
+
+  return (
+    <div className="p-5">
+      No active organization is available.
+    </div>
+  );
+}
 export default function App(){return <BrowserRouter><Routes><Route path="/" element={<Home/>}/><Route path="/login" element={<LoginPage/>}/><Route path="/register" element={<RegisterPage/>}/>
 <Route path="/school" element={<Guard type="school"><WorkspaceLayout type="school"/></Guard>}><Route index element={<SchoolDashboardPage/>}/><Route
   path="organization"
@@ -17,6 +155,11 @@ export default function App(){return <BrowserRouter><Routes><Route path="/" elem
   path="organization/members"
   element={
     <OrganizationMembersPage />
+  }
+/><Route
+  path="/select-organization"
+  element={
+    <OrganizationSelectionPage />
   }
 /><Route path="procurements" element={<ProcurementListPage/>}/><Route path="procurements/new" element={<ProcurementCreatePage/>}/><Route path="procurements/:id" element={<ProcurementDetailPage/>}/><Route path="procurements/:id/edit" element={<ProcurementEditPage/>}/><Route path="procurements/:id/evidence/new" element={<EvidenceUploadPage/>}/><Route path="procurements/:id/evaluation" element={<EvaluationPage/>}/><Route path="procurements/:id/order/new" element={<PurchaseOrderCreatePage/>}/><Route path="procurements/:id/delivery/new" element={<DeliveryCreatePage/>}/><Route path="deliveries/:id/inspect" element={<DeliveryVerificationPage/>}/></Route>
 <Route path="/supplier" element={<Guard type="supplier"><WorkspaceLayout type="supplier"/></Guard>}><Route index element={<SupplierDashboardPage/>}/><Route
