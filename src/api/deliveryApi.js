@@ -1,7 +1,9 @@
 import client from "./client";
 
 export async function recordDelivery(payload) {
-  const { data } = await client.post("/deliveries/", payload);
+  const { data } =
+    await client.post("/deliveries", payload);
+
   return data;
 }
 export async function getDelivery(id) {

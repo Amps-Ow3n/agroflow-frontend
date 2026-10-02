@@ -127,21 +127,41 @@ export default function ProcurementDetailPage() {
       // --------------------------------------------------
 
       try {
+  const deliveryResponse =
+    await getProcurementDeliveries(id);
 
-        const deliveryResponse =
-          await getProcurementDeliveries(id);
+  let deliveryList = [];
 
-        setDeliveries(
-          Array.isArray(deliveryResponse)
-            ? deliveryResponse
-            : deliveryResponse?.deliveries ||
-              []
-        );
+  if (Array.isArray(deliveryResponse)) {
+    deliveryList = deliveryResponse;
+  } else if (
+    Array.isArray(
+      deliveryResponse?.deliveries
+    )
+  ) {
+    deliveryList =
+      deliveryResponse.deliveries;
+  } else if (
+    deliveryResponse?.delivery
+  ) {
+    deliveryList = [
+      deliveryResponse.delivery,
+    ];
+  }
 
-      } catch (_) {
+  setDeliveries(deliveryList);
 
-        setDeliveries([]);
-      }
+} catch (e) {
+
+  setDeliveries([]);
+
+  setError(
+    getApiError(
+      e,
+      "Unable to load delivery information."
+    )
+  );
+}
 
     } catch (e) {
 
