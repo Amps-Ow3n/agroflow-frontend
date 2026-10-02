@@ -98,40 +98,19 @@ function deriveWorkspaceFromMembership(membership) {
     return null;
   }
 
-  const responsibilities = membership?.responsibilities || [];
+  const organizationType =
+    membership?.organization?.organization_type;
 
-  const responsibilityCodes = responsibilities.map((responsibility) => {
-    if (typeof responsibility === "string") {
-      return responsibility;
-    }
-
-    return responsibility?.code;
-  });
-
-  if (
-    responsibilityCodes.includes("ORGANIZATION_ADMIN")
-  ) {
-    return "admin";
-  }
-
-  if (
-    responsibilityCodes.includes("SUPPLIER_ADMIN") ||
-    responsibilityCodes.includes("SUPPLIER_USER")
-  ) {
-    return "supplier";
-  }
-
-  if (
-    responsibilityCodes.includes("PROCUREMENT_OFFICER") ||
-    responsibilityCodes.includes("PROCUREMENT_REVIEWER") ||
-    responsibilityCodes.includes("RECEIVING_OFFICER")
-  ) {
+  if (organizationType === "SCHOOL") {
     return "school";
+  }
+
+  if (organizationType === "SUPPLIER") {
+    return "supplier";
   }
 
   return null;
 }
-
 
 /* =========================================================
    RESPONSIBILITY HELPERS
