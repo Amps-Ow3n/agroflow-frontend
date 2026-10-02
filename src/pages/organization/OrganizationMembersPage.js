@@ -8,6 +8,7 @@ import {
 } from "../../context/AuthContext";
 
 import {
+  addOrganizationMember,
   getOrganizationMembers,
   getOrganizationResponsibilities,
   assignMemberResponsibility,
@@ -48,6 +49,21 @@ export default function OrganizationMembersPage() {
     setResponsibilities,
   ] = useState([]);
 
+
+  const [
+  newMemberEmail,
+  setNewMemberEmail,
+] = useState("");
+
+const [
+  newMemberResponsibility,
+  setNewMemberResponsibility,
+] = useState("");
+
+const [
+  addingMember,
+  setAddingMember,
+] = useState(false);
 
   const [
     loading,
@@ -201,6 +217,38 @@ export default function OrganizationMembersPage() {
     }
   }
 
+async function handleAddMember() {
+  if (
+    !newMemberEmail.trim() ||
+    !newMemberResponsibility
+  ) {
+    return;
+  }
+
+  try {
+    setAddingMember(true);
+    setError("");
+
+    await addOrganizationMember(
+      organizationId,
+      newMemberEmail.trim(),
+      newMemberResponsibility
+    );
+
+    setNewMemberEmail("");
+    setNewMemberResponsibility("");
+
+    await load();
+
+  } catch (err) {
+    setError(
+      err?.response?.data?.detail ||
+      "Unable to add organization member."
+    );
+  } finally {
+    setAddingMember(false);
+  }
+}
 
   return (
     <Page
@@ -210,6 +258,105 @@ export default function OrganizationMembersPage() {
         "Manage organization responsibilities."
       }
     >
+<div className="card border-0 shadow-sm mb-4">
+  <div className="card-body">
+
+    <div className="mb-3">
+      <h5 className="fw-semibold mb-1">
+        Add organization member
+      </h5>
+
+      <p className="text-muted small mb-0">
+        Add an existing AgroFlow user to this
+        organization and assign their initial
+        responsibility.
+      </p>
+    </div>
+
+    <div className="row g-2">
+
+      <div className="col-md-5">
+        <label className="form-label">
+          User email
+        </label>
+
+        <input
+          type="email"
+          className="form-control"
+          placeholder="user@example.com"
+          value={newMemberEmail}
+          onChange={(event) =>
+            setNewMemberEmail(
+              event.target.value
+            )
+          }
+          disabled={addingMember}
+        />
+      </div>
+
+
+      <div className="col-md-5">
+        <label className="form-label">
+          Initial responsibility
+        </label>
+
+        <select
+          className="form-select"
+          value={newMemberResponsibility}
+          onChange={(event) =>
+            setNewMemberResponsibility(
+              event.target.value
+            )
+          }
+          disabled={addingMember}
+        >
+          <option value="">
+            Select responsibility
+          </option>
+
+          {responsibilities.map(
+            (responsibility) => (
+              <option
+                key={
+                  responsibility.code
+                }
+                value={
+                  responsibility.code
+                }
+              >
+                {
+                  responsibility.name
+                }
+              </option>
+            )
+          )}
+        </select>
+      </div>
+
+
+      <div className="col-md-2 d-flex align-items-end">
+        <button
+          type="button"
+          className="btn btn-dark w-100"
+          disabled={
+            addingMember ||
+            !newMemberEmail.trim() ||
+            !newMemberResponsibility
+          }
+          onClick={
+            handleAddMember
+          }
+        >
+          {addingMember
+            ? "Adding..."
+            : "Add member"}
+        </button>
+      </div>
+
+    </div>
+
+  </div>
+</div>
 
       {error && (
         <div className="alert alert-danger">

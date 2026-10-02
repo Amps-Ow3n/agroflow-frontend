@@ -41,3 +41,20 @@ export async function assignMemberResponsibility(
 
   return data;
 }
+
+export async function addOrganizationMember(
+  organizationId,
+  email,
+  responsibilityCode
+) {
+  const { data } = await client.post(
+    `/organizations/${organizationId}/memberships`,
+    {
+      email,
+      responsibility_code:
+        responsibilityCode,
+    }
+  );
+
+  return data;
+}
