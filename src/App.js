@@ -144,6 +144,10 @@ function Home() {
   );
 }
 export default function App(){return <BrowserRouter><Routes><Route path="/" element={<Home/>}/><Route path="/login" element={<LoginPage/>}/><Route path="/register" element={<RegisterPage/>}/>
+<Route
+  path="/select-organization"
+  element={<OrganizationSelectionPage />}
+/>
 <Route path="/school" element={<Guard type="school"><WorkspaceLayout type="school"/></Guard>}><Route index element={<SchoolDashboardPage/>}/><Route
   path="organization"
   element={
@@ -155,11 +159,6 @@ export default function App(){return <BrowserRouter><Routes><Route path="/" elem
   path="organization/members"
   element={
     <OrganizationMembersPage />
-  }
-/><Route
-  path="/select-organization"
-  element={
-    <OrganizationSelectionPage />
   }
 /><Route path="procurements" element={<ProcurementListPage/>}/><Route path="procurements/new" element={<ProcurementCreatePage/>}/><Route path="procurements/:id" element={<ProcurementDetailPage/>}/><Route path="procurements/:id/edit" element={<ProcurementEditPage/>}/><Route path="procurements/:id/evidence/new" element={<EvidenceUploadPage/>}/><Route path="procurements/:id/evaluation" element={<EvaluationPage/>}/><Route path="procurements/:id/order/new" element={<PurchaseOrderCreatePage/>}/><Route path="procurements/:id/delivery/new" element={<DeliveryCreatePage/>}/><Route path="deliveries/:id/inspect" element={<DeliveryVerificationPage/>}/></Route>
 <Route path="/supplier" element={<Guard type="supplier"><WorkspaceLayout type="supplier"/></Guard>}><Route index element={<SupplierDashboardPage/>}/><Route
