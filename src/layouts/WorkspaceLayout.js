@@ -28,9 +28,10 @@ export default function WorkspaceLayout({ type }) {
 
 if (
   (type === "school" && isOrganizationAdmin) ||
-  (type === "supplier" && isSupplierAdmin) ||
-  (type === "supplier" && isOrganizationAdmin) ||
-  (type === "school" && isOrganizationAdmin)
+  (
+    type === "supplier" &&
+    (isOrganizationAdmin || isSupplierAdmin)
+  )
 ) {
   nav.push([
     type === "supplier"

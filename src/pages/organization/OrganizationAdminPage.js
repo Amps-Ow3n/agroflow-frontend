@@ -10,22 +10,25 @@ import {
 export default function OrganizationAdminPage() {
 
   const {
-    workspace,
-    verifiedMemberships,
+    activeMembership,
+    activeOrganization,
   } = useAuth();
 
-  const membership =
-    verifiedMemberships.find(
-      (item) =>
-        item?.organization?.organization_type ===
-        (workspace === "school"
-          ? "SCHOOL"
-          : "SUPPLIER")
-    ) ||
-    verifiedMemberships[0];
 
   const organization =
-    membership?.organization;
+    activeOrganization ||
+    activeMembership?.organization;
+
+
+  const organizationType =
+    organization?.organization_type;
+
+
+  const membersPath =
+    organizationType === "SUPPLIER"
+      ? "/supplier/organization/members"
+      : "/school/organization/members";
+
 
   return (
     <Page
@@ -50,8 +53,7 @@ export default function OrganizationAdminPage() {
               </h4>
 
               <div className="text-muted">
-                {organization?.organization_type ||
-                  "—"}
+                {organizationType || "—"}
               </div>
 
               <div className="mt-3">
@@ -94,11 +96,7 @@ export default function OrganizationAdminPage() {
               </p>
 
               <Link
-                to={
-                  workspace === "supplier"
-                    ? "/supplier/organization/members"
-                    : "/school/organization/members"
-                }
+                to={membersPath}
                 className="btn btn-dark"
               >
                 Manage members

@@ -23,42 +23,49 @@ import {
 export default function OrganizationMembersPage() {
 
   const {
-    verifiedMemberships,
+    activeMembership,
+    activeOrganization,
   } = useAuth();
 
-  const membership =
-    verifiedMemberships[0];
 
   const organization =
-    membership?.organization;
+    activeOrganization ||
+    activeMembership?.organization;
+
 
   const organizationId =
     organization?.id;
+
 
   const [
     members,
     setMembers,
   ] = useState([]);
 
+
   const [
     responsibilities,
     setResponsibilities,
   ] = useState([]);
+
 
   const [
     loading,
     setLoading,
   ] = useState(true);
 
+
   const [
     error,
     setError,
   ] = useState("");
 
+
   const [
     selectedRoles,
     setSelectedRoles,
   ] = useState({});
+
 
   const [
     busyUserId,
@@ -69,6 +76,7 @@ export default function OrganizationMembersPage() {
   async function load() {
 
     if (!organizationId) {
+      setLoading(false);
       return;
     }
 
@@ -89,9 +97,11 @@ export default function OrganizationMembersPage() {
         ),
       ]);
 
+
       setMembers(
         membersResponse.members || []
       );
+
 
       setResponsibilities(
         responsibilitiesResponse.responsibilities ||
@@ -131,6 +141,7 @@ export default function OrganizationMembersPage() {
     userId,
     value
   ) {
+
     setSelectedRoles(
       (current) => ({
         ...current,
@@ -147,14 +158,17 @@ export default function OrganizationMembersPage() {
     const responsibilityCode =
       getSelectedRole(userId);
 
+
     if (!responsibilityCode) {
       return;
     }
+
 
     try {
 
       setBusyUserId(userId);
       setError("");
+
 
       await assignMemberResponsibility(
         organizationId,
@@ -162,12 +176,14 @@ export default function OrganizationMembersPage() {
         responsibilityCode
       );
 
+
       setSelectedRoles(
         (current) => ({
           ...current,
           [userId]: "",
         })
       );
+
 
       await load();
 

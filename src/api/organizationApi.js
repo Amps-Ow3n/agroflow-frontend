@@ -4,8 +4,9 @@ import client from "./client";
 export async function getOrganizationMembers(
   organizationId
 ) {
+
   const { data } = await client.get(
-    `/organizations/${organizationId}/members`
+    `/organizations/${organizationId}/memberships`
   );
 
   return data;
@@ -15,6 +16,7 @@ export async function getOrganizationMembers(
 export async function getOrganizationResponsibilities(
   organizationId
 ) {
+
   const { data } = await client.get(
     `/organizations/${organizationId}/responsibilities`
   );
@@ -28,8 +30,9 @@ export async function assignMemberResponsibility(
   userId,
   responsibilityCode
 ) {
+
   const { data } = await client.post(
-    `/organizations/${organizationId}/members/${userId}/responsibilities`,
+    `/organizations/${organizationId}/memberships/${userId}/responsibilities`,
     {
       responsibility_code:
         responsibilityCode,
