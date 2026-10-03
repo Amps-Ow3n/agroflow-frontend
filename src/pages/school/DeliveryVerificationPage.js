@@ -8,13 +8,13 @@ export default function DeliveryVerificationPage() {
   const { id } = useParams();
   const nav = useNavigate();
 
-  const [delivery, setDelivery] = useState(null);
-  const [received, setReceived] = useState("");
-  const [result, setResult] = useState("ACCEPTED");
-  const [condition, setCondition] = useState("");
-  const [reason, setReason] = useState("");
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
+const [delivery, setDelivery] = useState(null);
+const [received, setReceived] = useState("");
+const [result, setResult] = useState("ACCEPTED");
+const [notes, setNotes] = useState("");
+const [rejectionReason, setRejectionReason] = useState("");
+const [error, setError] = useState("");
+const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     getDelivery(id)
@@ -23,31 +23,38 @@ export default function DeliveryVerificationPage() {
   }, [id]);
 
   async function submit(e) {
-    e.preventDefault();
-    setBusy(true);
-    setError("");
+  e.preventDefault();
+  setBusy(true);
+  setError("");
 
-    try {
-      await inspectDelivery(id, {
-        received_qty: Number(received),
-        result,
-        quality_status:
-          result === "ACCEPTED" ? "GOOD" : "FAILED",
-        delay_status: "ON_TIME",
-        rejection_reason:
-          result === "REJECTED" ? (reason || null) : null,
-        notes: reason || null,
-      });
+  try {
+    await inspectDelivery(id, {
+      received_qty: Number(received),
+      result,
+      quality_status:
+        result === "ACCEPTED"
+          ? "GOOD"
+          : "FAILED",
+      delay_status: "ON_TIME",
+      rejection_reason:
+        result === "REJECTED"
+          ? (rejectionReason || null)
+          : null,
+      notes: notes || null,
+    });
 
-      nav(-1);
-    } catch (e) {
-      setError(
-        getApiError(e, "Unable to inspect delivery.")
-      );
-    } finally {
-      setBusy(false);
-    }
+    nav(-1);
+  } catch (e) {
+    setError(
+      getApiError(
+        e,
+        "Unable to inspect delivery."
+      )
+    );
+  } finally {
+    setBusy(false);
   }
+}
 
   if (!delivery) {
     return (
@@ -155,38 +162,42 @@ export default function DeliveryVerificationPage() {
           </select>
 
           <label
-            htmlFor="inspection-condition"
-            className="form-label"
-          >
-            Condition
-          </label>
+  htmlFor="inspection-notes"
+  className="form-label"
+>
+  Inspection notes
+</label>
 
-          <textarea
-            id="inspection-condition"
-            className="form-control mb-3"
-            value={condition}
-            onChange={(e) =>
-              setCondition(e.target.value)
-            }
-            required
-          />
+<textarea
+  id="inspection-notes"
+  className="form-control mb-3"
+  value={notes}
+  onChange={(e) =>
+    setNotes(e.target.value)
+  }
+  placeholder="Record relevant inspection observations."
+/>
 
-          <label
-            htmlFor="inspection-reason"
-            className="form-label"
-          >
-            Reason
-          </label>
+{result === "REJECTED" && (
+  <>
+    <label
+      htmlFor="inspection-rejection-reason"
+      className="form-label"
+    >
+      Rejection reason
+    </label>
 
-          <textarea
-            id="inspection-reason"
-            className="form-control"
-            value={reason}
-            onChange={(e) =>
-              setReason(e.target.value)
-            }
-          />
-
+    <textarea
+      id="inspection-rejection-reason"
+      className="form-control"
+      value={rejectionReason}
+      onChange={(e) =>
+        setRejectionReason(e.target.value)
+      }
+      required
+    />
+  </>
+)}
           <button
             className="btn btn-dark mt-3"
             disabled={busy}
