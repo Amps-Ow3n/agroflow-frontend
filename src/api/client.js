@@ -21,18 +21,39 @@ const client = axios.create({
     process.env.REACT_APP_API_BASE_URL ||
     "https://agroflow-backend-ghom.onrender.com",
   withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 client.interceptors.request.use(
   (config) => {
-
     const method =
       (config.method || "get").toLowerCase();
 
+    /*
+     * ---------------------------------------------------------
+     * CONTENT TYPE
+     * ---------------------------------------------------------
+     *
+     * Do NOT force application/json globally.
+     *
+     * FormData requests (such as evidence uploads) must allow
+     * the browser/Axios to generate:
+     *
+     * multipart/form-data; boundary=...
+     *
+     * JSON requests will continue to be handled by Axios.
+     */
+    if (config.data instanceof FormData) {
+      if (config.headers) {
+        delete config.headers["Content-Type"];
+        delete config.headers["content-type"];
+      }
+    }
 
+    /*
+     * ---------------------------------------------------------
+     * CSRF
+     * ---------------------------------------------------------
+     */
     if (
       csrfToken &&
       ![
@@ -49,13 +70,15 @@ client.interceptors.request.use(
       ] = csrfToken;
     }
 
-
+    /*
+     * ---------------------------------------------------------
+     * ACTIVE ORGANIZATION
+     * ---------------------------------------------------------
+     */
     const organizationId =
       getActiveOrganizationId();
 
-
     if (organizationId) {
-
       config.headers =
         config.headers || {};
 
@@ -63,7 +86,6 @@ client.interceptors.request.use(
         "X-Organization-ID"
       ] = organizationId;
     }
-
 
     return config;
   }
