@@ -19,6 +19,8 @@ import { useAuth } from "../../context/AuthContext";
 
 export default function SupplierDashboardPage() {
 
+  const { activeOrganization } = useAuth();
+
   const [d, setD] = useState([]);
   const [s, setS] = useState(null);
   const [p, setP] = useState(null);
