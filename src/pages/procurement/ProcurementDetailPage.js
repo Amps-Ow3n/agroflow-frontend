@@ -38,11 +38,23 @@ import {
   Alert,
   Empty,
 } from "../../components/common/Page";
+import { useAuth } from "../../context/AuthContext";
 
 
 export default function ProcurementDetailPage() {
 
   const { id } = useParams();
+  const { hasPermission } = useAuth();
+
+  const canUpdateProcurement = hasPermission("procurement:update");
+  const canSubmitProcurement = hasPermission("procurement:submit");
+  const canCreatePurchaseOrder = hasPermission("purchase_order:create");
+  const canCreateDelivery = hasPermission("delivery:create");
+  const canInspectDelivery = hasPermission("delivery:inspect") || hasPermission("inspection:create");
+  const canEvaluate = hasPermission("procurement:evaluate");
+  const canSeeRealityReport = hasPermission("reality_report:view");
+  const canTransitionProcurement = hasPermission("procurement:transition");
+  const canCancelProcurement = hasPermission("procurement:cancel");
 
 
   const [p, setP] = useState(null);
@@ -352,7 +364,7 @@ export default function ProcurementDetailPage() {
         />
 
 
-        {["DRAFT", "SUBMITTED"].includes(
+        {canUpdateProcurement && ["DRAFT", "SUBMITTED"].includes(
           status
         ) && (
 
@@ -366,7 +378,7 @@ export default function ProcurementDetailPage() {
         )}
 
 
-        {status === "DRAFT" && (
+        {canSubmitProcurement && status === "DRAFT" && (
 
           <button
             className="btn btn-dark btn-sm"
@@ -384,7 +396,7 @@ export default function ProcurementDetailPage() {
         )}
 
 
-        {status === "SELECTED" && (
+        {canCreatePurchaseOrder && status === "SELECTED" && (
 
           <Link
             className="btn btn-dark btn-sm"
@@ -396,7 +408,7 @@ export default function ProcurementDetailPage() {
         )}
 
 
-        {canRecordDelivery && (
+        {canCreateDelivery && canRecordDelivery && (
 
           <Link
             className="btn btn-dark btn-sm"
@@ -408,7 +420,7 @@ export default function ProcurementDetailPage() {
         )}
 
 
-        {awaitingInspectionDelivery && (
+        {canInspectDelivery && awaitingInspectionDelivery && (
 
           <Link
             className="btn btn-warning btn-sm"
@@ -420,7 +432,7 @@ export default function ProcurementDetailPage() {
         )}
 
 
-        {["SUBMITTED", "EVALUATION"].includes(
+        {canEvaluate && ["SUBMITTED", "EVALUATION"].includes(
           status
         ) && (
 
@@ -436,7 +448,7 @@ export default function ProcurementDetailPage() {
         )}
 
 
-        {status !== "DRAFT" && status !== "CANCELLED" && (
+        {canSeeRealityReport && status !== "DRAFT" && status !== "CANCELLED" && (
           <Link
             className="btn btn-outline-primary btn-sm"
             to={`/school/procurements/${id}/reality-report`}
@@ -446,7 +458,7 @@ export default function ProcurementDetailPage() {
         )}
 
 
-        {status === "ACCEPTED" && (
+        {canTransitionProcurement && status === "ACCEPTED" && (
           <button
             className="btn btn-success btn-sm"
             disabled={busy}
@@ -457,7 +469,7 @@ export default function ProcurementDetailPage() {
         )}
 
 
-        {["DRAFT", "SUBMITTED"].includes(
+        {canCancelProcurement && ["DRAFT", "SUBMITTED"].includes(
           status
         ) && (
 
@@ -851,7 +863,7 @@ export default function ProcurementDetailPage() {
               </h5>
 
 
-              {canRecordDelivery && (
+              {canCreateDelivery && canRecordDelivery && (
 
                 <Link
                   className="btn btn-outline-dark btn-sm"
@@ -863,7 +875,7 @@ export default function ProcurementDetailPage() {
               )}
 
 
-              {awaitingInspectionDelivery && (
+              {canInspectDelivery && awaitingInspectionDelivery && (
 
                 <Link
                   className="btn btn-outline-warning btn-sm"

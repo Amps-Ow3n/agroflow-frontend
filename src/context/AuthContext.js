@@ -47,8 +47,13 @@ function getRejectedMemberships(identity) {
 }
 
 
-function getStoredOrganizationId() {
+function getStoredOrganizationId(userId = null) {
   try {
+    if (userId) {
+      return localStorage.getItem(`agroflow_active_organization_${userId}`);
+    }
+
+    // Backward compatibility with the earlier single-key implementation.
     return localStorage.getItem("activeOrganizationId");
   } catch (error) {
     return null;
@@ -56,17 +61,22 @@ function getStoredOrganizationId() {
 }
 
 
-function storeOrganizationId(organizationId) {
+function storeOrganizationId(organizationId, userId = null) {
   try {
     if (organizationId === null || organizationId === undefined) {
+      if (userId) {
+        localStorage.removeItem(`agroflow_active_organization_${userId}`);
+      }
       localStorage.removeItem("activeOrganizationId");
       return;
     }
 
-    localStorage.setItem(
-      "activeOrganizationId",
-      String(organizationId)
-    );
+    const value = String(organizationId);
+    if (userId) {
+      localStorage.setItem(`agroflow_active_organization_${userId}`, value);
+    }
+    // Keep the legacy key synchronized for existing API callers.
+    localStorage.setItem("activeOrganizationId", value);
   } catch (error) {
     // Ignore localStorage failures.
   }
@@ -209,60 +219,40 @@ export function AuthProvider({ children }) {
 
 
   /* =======================================================
-     ORGANIZATION SELECTION
+     ORGANIZATION CONTEXT
      ======================================================= */
 
   useEffect(() => {
-    if (!identity) {
-      return;
-    }
+    if (!identity) return;
 
-    // System admins do not need an organization context.
     if (identity?.user?.is_system_admin === true) {
       return;
     }
 
-    const verifiedMemberships =
-      getVerifiedMemberships(identity);
-
-    // No verified organizations.
-    if (verifiedMemberships.length === 0) {
-      storeOrganizationId(null);
+    const memberships = getVerifiedMemberships(identity);
+    if (!memberships.length) {
       setActiveOrganizationId(null);
       return;
     }
 
-    // Exactly one verified organization:
-    // automatically select it.
-    if (verifiedMemberships.length === 1) {
-      const organizationId =
-        verifiedMemberships[0]?.organization?.id;
+    const userId = identity.user?.id;
+    const rememberedId = getStoredOrganizationId(userId);
+    const validRemembered = resolveActiveMembership(identity, rememberedId);
 
-      storeOrganizationId(organizationId);
-      setActiveOrganizationId(
-        String(organizationId)
-      );
-
+    if (validRemembered) {
+      storeOrganizationId(rememberedId, userId);
+      setActiveOrganizationId(String(rememberedId));
       return;
     }
 
-    // Multiple organizations:
-    // keep the selected organization only if it is
-    // still one of the user's verified memberships.
-    const selectedMembership =
-      resolveActiveMembership(
-        identity,
-        activeOrganizationId
-      );
-
-    if (!selectedMembership) {
-      storeOrganizationId(null);
-      setActiveOrganizationId(null);
-    }
-  }, [
-    identity,
-    activeOrganizationId,
-  ]);
+    // A user normally belongs to one organization. When there are several,
+    // choose the first verified membership as the initial context and keep
+    // that choice per user. The server still validates every organization
+    // and resource access against the user's membership.
+    const firstOrganizationId = memberships[0]?.organization?.id;
+    storeOrganizationId(firstOrganizationId, userId);
+    setActiveOrganizationId(String(firstOrganizationId));
+  }, [identity]);
 
 
   /* =======================================================
@@ -314,7 +304,7 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    storeOrganizationId(organizationId);
+    storeOrganizationId(organizationId, identity?.user?.id);
 
     setActiveOrganizationId(
       String(organizationId)
@@ -327,7 +317,11 @@ export function AuthProvider({ children }) {
      ======================================================= */
 
   function clearOrganizationSelection() {
-    storeOrganizationId(null);
+    try {
+      localStorage.removeItem("activeOrganizationId");
+    } catch (error) {
+      // Ignore localStorage failures.
+    }
     setActiveOrganizationId(null);
   }
 
@@ -340,6 +334,11 @@ export function AuthProvider({ children }) {
       setIdentity(null);
       setLoading(false);
     }
+  }
+
+
+  function activeMembershipHasPermission(permission) {
+    return (activeMembership?.permissions || []).includes(permission);
   }
 
 
@@ -428,10 +427,7 @@ export function AuthProvider({ children }) {
   const hasVerifiedOrganization =
     verifiedMemberships.length > 0;
 
-  const requiresOrganizationSelection =
-    identity?.user?.is_system_admin !== true &&
-    verifiedMemberships.length > 1 &&
-    !activeMembership;
+  const requiresOrganizationSelection = false;
 
 
   /* =======================================================
@@ -477,6 +473,9 @@ export function AuthProvider({ children }) {
           identity,
           responsibilityCode
         ),
+
+      hasPermission: (permission) =>
+        activeMembershipHasPermission(permission),
 
       selectOrganization,
 

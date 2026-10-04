@@ -16,24 +16,37 @@ const overviewCards = [
 ];
 
 export default function OrganizationAdminPage() {
-  const { activeMembership, activeOrganization, activeOrganizationId } = useAuth();
+  const { activeMembership, activeOrganization, activeOrganizationId, hasPermission } = useAuth();
+  const canManageOrganization = hasPermission("organization:manage_members") || hasPermission("organization:update");
   const organization = activeOrganization || activeMembership?.organization;
   const organizationType = organization?.organization_type;
   const membersPath = organizationType === "SUPPLIER" ? "/supplier/organization/members" : "/school/organization/members";
+  const procurementBase = organizationType === "SUPPLIER" ? "/supplier" : "/school";
 
   const [dashboard, setDashboard] = useState(null);
-  const [loading, setLoading] = useState(organizationType === "SCHOOL");
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (organizationType !== "SCHOOL" || !activeOrganizationId) return;
+    if (!canManageOrganization || !activeOrganizationId) return;
 
     setLoading(true);
     getOrganizationDashboard(activeOrganizationId)
       .then(setDashboard)
       .catch((err) => setError(getApiError(err, "Unable to load organization oversight.")))
       .finally(() => setLoading(false));
-  }, [organizationType, activeOrganizationId]);
+  }, [canManageOrganization, organizationType, activeOrganizationId]);
+
+  if (!canManageOrganization) {
+    return (
+      <Page
+        title="Organization administration"
+        subtitle="This area is restricted to organization administrators."
+      >
+        <Alert type="warning">You have organization-level visibility, but you are not assigned the responsibility required to manage organization governance.</Alert>
+      </Page>
+    );
+  }
 
   return (
     <Page
@@ -71,8 +84,7 @@ export default function OrganizationAdminPage() {
         </div>
       </div>
 
-      {organizationType === "SCHOOL" && (
-        loading ? <Loading /> : error ? <Alert>{error}</Alert> : dashboard && (
+      {loading ? <Loading /> : error ? <Alert>{error}</Alert> : dashboard && (
           <>
             <div className="row g-3 mb-4">
               {overviewCards.map(([key, label]) => (
@@ -91,13 +103,17 @@ export default function OrganizationAdminPage() {
               <div className="col-lg-7">
                 <div className="card border-0 shadow-sm">
                   <div className="card-body">
-                    <h5>Recent organization activity</h5>
+                    <h5>{organizationType === "SUPPLIER" ? "Recent supplier activity" : "Recent procurement activity"}</h5>
                     {dashboard.recent_procurements?.length ? dashboard.recent_procurements.map((item) => (
                       <div className="border-bottom py-3" key={item.id}>
                         <div className="d-flex justify-content-between align-items-start gap-3">
                           <div>
-                            <Link to={`/school/procurements/${item.id}`} className="fw-semibold">{item.procurement_identifier}</Link>
-                            <div className="small text-muted">{item.title}</div>
+                            {organizationType === "SUPPLIER" ? (
+                              <Link to="/supplier/commitments" className="fw-semibold">{item.procurement_identifier || `Commitment #${item.id}`}</Link>
+                            ) : (
+                              <Link to={`${procurementBase}/procurements/${item.id}`} className="fw-semibold">{item.procurement_identifier}</Link>
+                            )}
+                            <div className="small text-muted">{item.title || item.status || "Supplier commitment"}</div>
                           </div>
                           <Status value={item.status} />
                         </div>
@@ -117,7 +133,7 @@ export default function OrganizationAdminPage() {
                         <Link to={`/school/procurements/${item.procurement_id}`}>{item.procurement_identifier}</Link>
                         <div className="small text-muted">{item.result} · {item.quality_status} · {item.delay_status}</div>
                       </div>
-                    )) : <div className="alert alert-success mb-0">No rejected, delayed or failed-quality inspections are recorded.</div>}
+                    )) : <div className="alert alert-success mb-0">No recorded exceptions require attention.</div>}
                   </div>
                 </div>
               </div>

@@ -3,8 +3,6 @@ import{BrowserRouter,Routes,Route,Navigate}from"react-router-dom";import{useAuth
 
 import OrganizationMembersPage
   from "./pages/organization/OrganizationMembersPage";
-import OrganizationSelectionPage
-  from "./pages/auth/OrganizationSelectionPage";
 function Guard({
   type,
   children,
@@ -37,18 +35,6 @@ function Guard({
     );
   }
 
-
-  if (
-    verifiedMemberships.length > 1 &&
-    !activeOrganizationId
-  ) {
-    return (
-      <Navigate
-        to="/select-organization"
-        replace
-      />
-    );
-  }
 
 
   if (workspace !== type) {
@@ -94,18 +80,6 @@ function Home() {
   }
 
 
-  if (
-    verifiedMemberships.length > 1 &&
-    !activeOrganizationId
-  ) {
-    return (
-      <Navigate
-        to="/select-organization"
-        replace
-      />
-    );
-  }
-
 
   if (workspace === "school") {
     return (
@@ -146,7 +120,7 @@ function Home() {
 export default function App(){return <BrowserRouter><Routes><Route path="/" element={<Home/>}/><Route path="/login" element={<LoginPage/>}/><Route path="/register" element={<RegisterPage/>}/>
 <Route
   path="/select-organization"
-  element={<OrganizationSelectionPage />}
+  element={<Navigate to="/" replace />}
 />
 <Route path="/school" element={<Guard type="school"><WorkspaceLayout type="school"/></Guard>}><Route index element={<SchoolDashboardPage/>}/><Route
   path="organization"

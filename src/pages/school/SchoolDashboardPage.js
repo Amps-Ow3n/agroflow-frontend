@@ -16,7 +16,8 @@ const cards = [
 ];
 
 export default function SchoolDashboardPage() {
-  const { activeOrganizationId } = useAuth();
+  const { activeOrganizationId, hasPermission } = useAuth();
+  const canCreateProcurement = hasPermission("procurement:create");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -35,10 +36,18 @@ export default function SchoolDashboardPage() {
     <Page
       title="School procurement"
       subtitle="Monitor procurement work, responsibilities and verified outcomes."
-      actions={<Link className="btn btn-dark" to="/school/procurements/new">New procurement</Link>}
+      actions={canCreateProcurement ? <Link className="btn btn-dark" to="/school/procurements/new">New procurement</Link> : null}
     >
       {loading ? <Loading /> : error ? <Alert>{error}</Alert> : !data ? <Empty>No organization context is available.</Empty> : (
         <>
+          <div className="alert alert-light border d-flex justify-content-between align-items-center gap-3 mb-4">
+            <div>
+              <div className="fw-semibold">Organization view</div>
+              <div className="small text-muted">This dashboard reflects procurement records for the active organization, regardless of which authorized member performed the work.</div>
+            </div>
+            <span className="badge text-bg-dark">{data.organization?.name || "Active organization"}</span>
+          </div>
+
           <div className="row g-3 mb-4">
             {cards.map(([key, label]) => (
               <div className="col-6 col-lg-2" key={key}>

@@ -14,6 +14,7 @@ import {
 } from "../../components/common/Page";
 
 import { getApiError } from "../../utils/errors";
+import { useAuth } from "../../context/AuthContext";
 
 
 export default function SupplierDashboardPage() {
@@ -128,7 +129,7 @@ export default function SupplierDashboardPage() {
   return (
     <Page
       title="Supplier operations"
-      subtitle="Manage the supplier entity, commitments and historical performance."
+      subtitle={`Manage ${activeOrganization?.name || "your supplier organization"}, commitments and historical performance.`}
       actions={
         <Link
           className="btn btn-dark"
