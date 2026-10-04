@@ -9,6 +9,7 @@ import {
 import {
   getCurrentIdentity,
   login as loginRequest,
+  logout as logoutRequest,
 } from "../api/authApi";
 
 
@@ -331,6 +332,17 @@ export function AuthProvider({ children }) {
   }
 
 
+  async function logout() {
+    try {
+      await logoutRequest();
+    } finally {
+      clearOrganizationSelection();
+      setIdentity(null);
+      setLoading(false);
+    }
+  }
+
+
   /* =======================================================
      DERIVED ORGANIZATION STATE
      ======================================================= */
@@ -473,6 +485,8 @@ export function AuthProvider({ children }) {
       reloadIdentity: loadIdentity,
 
       login,
+
+      logout,
     }),
     [
       identity,
@@ -488,6 +502,7 @@ export function AuthProvider({ children }) {
       workspace,
       isOrganizationAdmin,
       isSupplierAdmin,
+      logout,
     ]
   );
 

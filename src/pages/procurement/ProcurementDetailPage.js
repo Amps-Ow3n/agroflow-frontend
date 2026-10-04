@@ -5,6 +5,7 @@ import {
   getProcurement,
   submitProcurement,
   cancelProcurement,
+  completeProcurement,
 } from "../../api/procurementApi";
 
 import {
@@ -220,6 +221,17 @@ export default function ProcurementDetailPage() {
   }
 
 
+  async function handleCompleteProcurement() {
+    const confirmed = window.confirm(
+      "Close this procurement cycle as completed? This should only be done after the accepted inspection results are final."
+    );
+
+    if (!confirmed) return;
+
+    await action(() => completeProcurement(id));
+  }
+
+
   async function handleRejectCommitment(
     commitmentId
   ) {
@@ -421,6 +433,27 @@ export default function ProcurementDetailPage() {
               : "Evaluate suppliers"}
           </Link>
 
+        )}
+
+
+        {status !== "DRAFT" && status !== "CANCELLED" && (
+          <Link
+            className="btn btn-outline-primary btn-sm"
+            to={`/school/procurements/${id}/reality-report`}
+          >
+            Reality Report
+          </Link>
+        )}
+
+
+        {status === "ACCEPTED" && (
+          <button
+            className="btn btn-success btn-sm"
+            disabled={busy}
+            onClick={handleCompleteProcurement}
+          >
+            Complete procurement
+          </button>
         )}
 
 

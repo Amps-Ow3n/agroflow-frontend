@@ -12,7 +12,7 @@ export function clearCsrfToken() {
 
 export function getActiveOrganizationId() {
   return localStorage.getItem(
-    "agroflow_active_organization_id"
+    "activeOrganizationId"
   );
 }
 

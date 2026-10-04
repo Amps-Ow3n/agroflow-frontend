@@ -33,3 +33,8 @@ export async function transitionProcurement(id, status, reason = null) {
   });
   return data;
 }
+
+export async function completeProcurement(id) {
+  const { data } = await client.post(`/procurements/${id}/complete`);
+  return data;
+}

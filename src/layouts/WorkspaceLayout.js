@@ -59,7 +59,22 @@ if (
         </nav>
         <div className="mt-auto pt-5">
           <div className="small text-muted mb-2">{user?.full_name || user?.name}</div>
-          <button className="btn btn-outline-danger btn-sm w-100" onClick={() => { logout(); navigate("/login"); }}>
+          <button
+            className="btn btn-outline-danger btn-sm w-100"
+            onClick={async () => {
+              const confirmed = window.confirm(
+                "Are you sure you want to log out?"
+              );
+
+              if (!confirmed) return;
+
+              try {
+                await logout();
+              } finally {
+                navigate("/login", { replace: true });
+              }
+            }}
+          >
             Log out
           </button>
         </div>
