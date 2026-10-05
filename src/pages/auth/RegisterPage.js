@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "../../api/authApi";
 import { getApiError } from "../../utils/errors";
+import PasswordInput from "../../components/common/PasswordInput";
 
 const schoolResponsibilities = ["ORGANIZATION_ADMIN","PROCUREMENT_OFFICER","PROCUREMENT_REVIEWER","RECEIVING_OFFICER"];
 const supplierResponsibilities = ["ORGANIZATION_ADMIN","SUPPLIER_USER","SUPPLIER_ADMIN"];
@@ -20,7 +21,7 @@ export default function RegisterPage() {
       {error&&<div className="alert alert-danger">{error}</div>}{success&&<div className="alert alert-success">{success}</div>}
       {[
         ["full_name","Full name","text"],["email","Email","email"],["password","Password","password"],["organization_name","Organization name","text"]
-      ].map(([k,l,t])=><div key={k} className="mb-3"><label className="form-label">{l}</label><input className="form-control" type={t} value={form[k]} onChange={e=>set(k,e.target.value)} required /></div>)}
+      ].map(([k,l,t])=><div key={k} className="mb-3"><label className="form-label">{l}</label>{t === "password" ? <PasswordInput id={k} value={form[k]} onChange={e=>set(k,e.target.value)} /> : <input className="form-control" type={t} value={form[k]} onChange={e=>set(k,e.target.value)} required />} </div>)}
       <label className="form-label">Organization type</label>
       <select className="form-select mb-3" value={form.organization_type} onChange={e=>typeChange(e.target.value)}><option>SCHOOL</option><option>SUPPLIER</option></select>
       <label className="form-label">Responsibility</label>

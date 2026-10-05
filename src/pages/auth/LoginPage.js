@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { getApiError } from "../../utils/errors";
+import PasswordInput from "../../components/common/PasswordInput";
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -34,7 +35,7 @@ export default function LoginPage() {
         <label className="form-label">Email</label>
         <input className="form-control mb-3" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         <label className="form-label">Password</label>
-        <input className="form-control mb-3" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+        <PasswordInput id="login-password" value={password} onChange={(e) => setPassword(e.target.value)} />
         <button className="btn btn-dark w-100" disabled={busy}>{busy ? "Signing in…" : "Sign in"}</button>
         <div className="text-center mt-3 small">
           New organization? <Link to="/register">Register</Link>

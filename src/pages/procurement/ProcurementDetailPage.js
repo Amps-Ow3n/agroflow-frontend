@@ -54,6 +54,7 @@ export default function ProcurementDetailPage() {
   const canEvaluate = hasPermission("procurement:evaluate");
   const canSeeRealityReport = hasPermission("reality_report:view");
   const canTransitionProcurement = hasPermission("procurement:transition");
+  const canCompleteProcurement = canTransitionProcurement;
   const canCancelProcurement = hasPermission("procurement:cancel");
 
 
@@ -364,9 +365,7 @@ export default function ProcurementDetailPage() {
         />
 
 
-        {canUpdateProcurement && ["DRAFT", "SUBMITTED"].includes(
-          status
-        ) && (
+        {canUpdateProcurement && status === "DRAFT" && (
 
           <Link
             className="btn btn-outline-secondary btn-sm"
@@ -458,7 +457,7 @@ export default function ProcurementDetailPage() {
         )}
 
 
-        {canTransitionProcurement && status === "ACCEPTED" && (
+        {canCompleteProcurement && status === "ACCEPTED" && (
           <button
             className="btn btn-success btn-sm"
             disabled={busy}

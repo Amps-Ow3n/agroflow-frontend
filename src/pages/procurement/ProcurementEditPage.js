@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getProcurement, updateProcurement } from "../../api/procurementApi";
 import { getApiError } from "../../utils/errors";
 import { Page, Loading, Alert } from "../../components/common/Page";
+import { parseNumericInput, displayNumericInput, allowedUnitsForProduct } from "../../utils/formatters";
 
 export default function ProcurementEditPage() {
   const { id } = useParams();
@@ -24,12 +25,19 @@ export default function ProcurementEditPage() {
         item_name: item.item_name || p.item_name || "",
         quantity: item.quantity ?? p.quantity ?? "",
         unit: item.unit || p.unit || "kg",
+        procurement_date: p.procurement_date || "",
+        procurement_method: p.procurement_method || "QUOTATION",
       });
     }).catch((e) => setError(getApiError(e)));
   }, [id]);
 
   function set(k, v) {
     setForm((x) => ({ ...x, [k]: v }));
+  }
+
+  function setItemName(value) {
+    const allowed = allowedUnitsForProduct(value);
+    setForm((x) => ({ ...x, item_name: value, unit: allowed.includes(x.unit) ? x.unit : allowed[0] }));
   }
 
   async function submit(e) {
@@ -44,8 +52,10 @@ export default function ProcurementEditPage() {
         required_by_date: form.required_by_date,
         location: form.location,
         item_name: form.item_name,
-        quantity: Number(form.quantity),
+        quantity: parseNumericInput(form.quantity),
         unit: form.unit,
+        procurement_date: form.procurement_date || null,
+        procurement_method: form.procurement_method,
       });
 
       nav(`/school/procurements/${id}`);
@@ -99,7 +109,7 @@ export default function ProcurementEditPage() {
           id="edit-item"
           className="form-control mb-3"
           value={form.item_name}
-          onChange={(e) => set("item_name", e.target.value)}
+          onChange={(e) => setItemName(e.target.value)}
           required
         />
 
@@ -112,10 +122,9 @@ export default function ProcurementEditPage() {
         <input
           id="edit-quantity"
           className="form-control mb-3"
-          type="number"
-          min="0.01"
-          step="0.01"
-          value={form.quantity}
+          type="text"
+          inputMode="decimal"
+          value={displayNumericInput(form.quantity)}
           onChange={(e) => set("quantity", e.target.value)}
           required
         />
@@ -126,13 +135,46 @@ export default function ProcurementEditPage() {
         >
           Unit
         </label>
-        <input
+        <select
           id="edit-unit"
-          className="form-control mb-3"
+          className="form-select mb-3"
           value={form.unit}
           onChange={(e) => set("unit", e.target.value)}
           required
+        >
+          {allowedUnitsForProduct(form.item_name).map((unit) => <option key={unit} value={unit}>{unit}</option>)}
+        </select>
+
+        <label
+          htmlFor="edit-procurement-date"
+          className="form-label"
+        >
+          Procurement date
+        </label>
+        <input
+          id="edit-procurement-date"
+          className="form-control mb-3"
+          type="date"
+          value={form.procurement_date}
+          onChange={(e) => set("procurement_date", e.target.value)}
         />
+
+        <label htmlFor="edit-method" className="form-label">
+          Procurement method
+        </label>
+        <select
+          id="edit-method"
+          className="form-select mb-3"
+          value={form.procurement_method}
+          onChange={(e) => set("procurement_method", e.target.value)}
+        >
+          <option>MICRO_PROCUREMENT</option>
+          <option>QUOTATION</option>
+          <option>RESTRICTED_DOMESTIC_BIDDING</option>
+          <option>OPEN_DOMESTIC_BIDDING</option>
+          <option>FRAMEWORK_CONTRACT</option>
+          <option>DIRECT_PROCUREMENT</option>
+        </select>
 
         <label
           htmlFor="edit-required-by"

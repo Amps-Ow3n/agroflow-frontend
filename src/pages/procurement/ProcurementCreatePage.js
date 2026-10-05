@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { createProcurement } from "../../api/procurementApi";
 import { getApiError } from "../../utils/errors";
 import { Page } from "../../components/common/Page";
+import { parseNumericInput, displayNumericInput, allowedUnitsForProduct } from "../../utils/formatters";
 
 const methods = [
   "MICRO_PROCUREMENT",
@@ -41,6 +42,11 @@ export default function ProcurementCreatePage() {
     setF((x) => ({ ...x, [k]: v }));
   }
 
+  function setItemName(value) {
+    const allowed = allowedUnitsForProduct(value);
+    setF((x) => ({ ...x, item_name: value, unit: allowed.includes(x.unit) ? x.unit : allowed[0] }));
+  }
+
   async function submit(e) {
     e.preventDefault();
     setError("");
@@ -49,9 +55,8 @@ export default function ProcurementCreatePage() {
     try {
       const payload = {
         ...f,
-        quantity: Number(f.quantity),
-        estimated_cost:
-          f.estimated_cost === "" ? null : Number(f.estimated_cost),
+        quantity: parseNumericInput(f.quantity),
+        estimated_cost: parseNumericInput(f.estimated_cost),
         procurement_date: f.procurement_date || null,
         description: f.description || null,
         item_description: f.item_description || null,
@@ -102,7 +107,7 @@ export default function ProcurementCreatePage() {
               id="item_name"
               className="form-control"
               value={f.item_name}
-              onChange={(e) => set("item_name", e.target.value)}
+              onChange={(e) => setItemName(e.target.value)}
               required
             />
           </div>
@@ -111,13 +116,15 @@ export default function ProcurementCreatePage() {
             <label htmlFor="unit" className="form-label">
               Unit
             </label>
-            <input
+            <select
               id="unit"
-              className="form-control"
+              className="form-select"
               value={f.unit}
               onChange={(e) => set("unit", e.target.value)}
               required
-            />
+            >
+              {allowedUnitsForProduct(f.item_name).map((unit) => <option key={unit} value={unit}>{unit}</option>)}
+            </select>
           </div>
 
           <div className="col-md-6">
@@ -154,10 +161,9 @@ export default function ProcurementCreatePage() {
             <input
               id="quantity"
               className="form-control"
-              type="number"
-              min="0.01"
-              step="0.01"
-              value={f.quantity}
+              type="text"
+              inputMode="decimal"
+              value={displayNumericInput(f.quantity)}
               onChange={(e) => set("quantity", e.target.value)}
               required
             />
@@ -201,10 +207,9 @@ export default function ProcurementCreatePage() {
             <input
               id="estimated_cost"
               className="form-control"
-              type="number"
-              min="0"
-              step="0.01"
-              value={f.estimated_cost}
+              type="text"
+              inputMode="decimal"
+              value={displayNumericInput(f.estimated_cost)}
               onChange={(e) =>
                 set("estimated_cost", e.target.value)
               }
