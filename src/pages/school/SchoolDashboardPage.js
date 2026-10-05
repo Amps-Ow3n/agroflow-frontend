@@ -16,25 +16,46 @@ const cards = [
 ];
 
 export default function SchoolDashboardPage() {
-  const { activeOrganizationId, activeMembership, loading: authLoading, hasPermission } = useAuth();
+  const {
+  activeOrganization,
+  activeOrganizationId,
+  loading: authLoading,
+  hasPermission,
+} = useAuth();
   const canCreateProcurement = hasPermission("procurement:create");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const organizationId =
-      activeMembership?.organization?.id || activeOrganizationId;
+  if (authLoading) {
+    return;
+  }
 
-    if (authLoading || !organizationId) return;
+  if (!activeOrganizationId) {
+    setData(null);
+    setLoading(false);
+    setError("No active organization is selected.");
+    return;
+  }
 
-    setLoading(true);
-    setError("");
-    getOrganizationDashboard(organizationId)
-      .then(setData)
-      .catch((err) => setError(getApiError(err, "Unable to load the school dashboard.")))
-      .finally(() => setLoading(false));
-  }, [authLoading, activeMembership, activeOrganizationId]);
+  setLoading(true);
+  setError("");
+
+  getOrganizationDashboard(activeOrganizationId)
+    .then(setData)
+    .catch((err) =>
+      setError(
+        getApiError(
+          err,
+          "Unable to load the school dashboard."
+        )
+      )
+    )
+    .finally(() => {
+      setLoading(false);
+    });
+}, [authLoading, activeOrganizationId]);
 
   return (
     <Page
