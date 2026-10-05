@@ -463,7 +463,7 @@ export default function ProcurementDetailPage() {
             disabled={busy}
             onClick={handleCompleteProcurement}
           >
-            Complete procurement
+            Complete procurement cycle
           </button>
         )}
 
@@ -508,6 +508,24 @@ export default function ProcurementDetailPage() {
         <Alert>
           {error}
         </Alert>
+      )}
+
+      {status === "ACCEPTED" && canCompleteProcurement && (
+        <div className="alert alert-success border mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+          <div>
+            <div className="fw-semibold">Procurement ready to close</div>
+            <div className="small">
+              The recorded deliveries have been inspected and accepted. Any quantity variance remains part of the procurement record. Complete the cycle to move it from ACCEPTED to COMPLETED.
+            </div>
+          </div>
+          <button
+            className="btn btn-success"
+            disabled={busy}
+            onClick={handleCompleteProcurement}
+          >
+            Complete procurement cycle
+          </button>
+        </div>
       )}
 
 
@@ -1051,110 +1069,53 @@ export default function ProcurementDetailPage() {
         <div className="col-lg-5">
 
 
-          {/* TIMELINE */}
-
-          <div className="card border-0 shadow-sm p-4 mb-3">
-
-            <h5>
-              Timeline
-            </h5>
-
-
-            {timeline.length ? (
-
-              <ul className="list-group list-group-flush">
-
-                {timeline
-                  .slice(0, 12)
-                  .map(
-                    (e) => (
-
-                      <li
-                        className="list-group-item px-0"
-                        key={e.id}
-                      >
-
-                        <strong>
-                          {e.title ||
-                            e.event_type}
-                        </strong>
-
-                        <div className="small text-muted">
-
-                          {e.occurred_at}
-                          {" · "}
-                          {e.actor_name}
-
-                        </div>
-
-                      </li>
-
-                    )
-                  )}
-
-              </ul>
-
-            ) : (
-
-              <Empty>
-                No events.
-              </Empty>
-
-            )}
-
-          </div>
-
-
-          {/* AUDIT */}
+          {/* TRACEABILITY */}
 
           <div className="card border-0 shadow-sm p-4">
-
-            <h5>
-              Audit
-            </h5>
-
-
-            {audit.length ? (
-
-              <div className="small">
-
-                {audit
-                  .slice(0, 10)
-                  .map(
-                    (e) => (
-
-                      <div
-                        className="border-bottom py-2"
-                        key={e.id}
-                      >
-
-                        {e.action}
-
-                        <div className="text-muted">
-
-                          {e.created_at}
-                          {" · "}
-                          {e.actor_name}
-
-                        </div>
-
-                      </div>
-
-                    )
-                  )}
-
+            <div className="d-flex justify-content-between align-items-start gap-3 mb-2">
+              <div>
+                <h5 className="mb-1">Traceability</h5>
+                <div className="small text-muted">Operational history and immutable audit records are retained in AgroFlow for evidence and accountability.</div>
               </div>
+              <span className="badge text-bg-light">{timeline.length} events · {audit.length} audit records</span>
+            </div>
 
-            ) : (
+            <details className="border-top pt-3 mt-3">
+              <summary className="fw-semibold">View procurement timeline</summary>
+              <div className="pt-3">
+                {timeline.length ? (
+                  <ul className="list-group list-group-flush">
+                    {timeline.slice(0, 20).map((e) => (
+                      <li className="list-group-item px-0" key={e.id}>
+                        <strong>{e.title || e.event_type}</strong>
+                        <div className="small text-muted">{e.occurred_at} · {e.actor_name}</div>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <Empty>No events.</Empty>
+                )}
+              </div>
+            </details>
 
-              <Empty>
-                No audit events.
-              </Empty>
-
-            )}
-
+            <details className="border-top pt-3 mt-3">
+              <summary className="fw-semibold">View audit trail</summary>
+              <div className="pt-3">
+                {audit.length ? (
+                  <div className="small">
+                    {audit.slice(0, 20).map((e) => (
+                      <div className="border-bottom py-2" key={e.id}>
+                        <div className="fw-semibold">{e.action}</div>
+                        <div className="text-muted">{e.created_at} · {e.actor_name}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <Empty>No audit events.</Empty>
+                )}
+              </div>
+            </details>
           </div>
-
         </div>
 
       </div>
