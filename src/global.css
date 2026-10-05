@@ -58,3 +58,119 @@ aside {
 @media (max-width: 768px) {
   aside { width: 210px !important; }
 }
+
+
+/* =========================================================
+   Responsive workspace
+   ========================================================= */
+
+.af-workspace {
+  min-width: 0;
+}
+
+.af-sidebar {
+  flex: 0 0 260px;
+}
+
+.af-workspace-main {
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+@media (max-width: 991.98px) {
+  .af-sidebar {
+    flex-basis: 220px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .af-workspace {
+    flex-direction: column;
+  }
+
+  .af-sidebar {
+    width: 100% !important;
+    min-height: auto;
+    flex: 0 0 auto;
+    position: relative;
+    border-right: 0 !important;
+    border-bottom: 1px solid var(--af-border) !important;
+    padding: .75rem !important;
+  }
+
+  .af-sidebar .mb-4 {
+    margin-bottom: .75rem !important;
+  }
+
+  .af-sidebar .mt-auto {
+    margin-top: .75rem !important;
+    padding-top: 0 !important;
+  }
+
+  .af-workspace-nav {
+    flex-direction: row !important;
+    overflow-x: auto;
+    padding-bottom: .15rem;
+    scrollbar-width: thin;
+    white-space: nowrap;
+  }
+
+  .af-workspace-nav .nav-link {
+    flex: 0 0 auto;
+  }
+
+  .af-workspace-main {
+    width: 100%;
+    padding: 1rem !important;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .table-responsive {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .btn {
+    min-height: 42px;
+  }
+
+  .d-flex > .btn {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .af-workspace-main {
+    padding: .75rem !important;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  h3 {
+    font-size: 1.15rem;
+  }
+
+  h4 {
+    font-size: 1.05rem;
+  }
+
+  h5 {
+    font-size: 1rem;
+  }
+
+  .table {
+    font-size: .9rem;
+  }
+
+  .alert {
+    overflow-wrap: anywhere;
+  }
+}

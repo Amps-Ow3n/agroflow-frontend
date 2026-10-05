@@ -42,13 +42,13 @@ if (
 }
 
   return (
-    <div className="d-flex min-vh-100 bg-light">
-      <aside className="bg-white border-end p-3" style={{ width: 260 }}>
+    <div className="af-workspace d-flex min-vh-100 bg-light">
+      <aside className="af-sidebar bg-white border-end p-3" style={{ width: 260 }}>
         <div className="fw-bold fs-5 mb-1">AgroFlow</div>
         <div className="small text-muted mb-4">
           {type === "school" ? "School procurement" : type === "supplier" ? "Supplier operations" : "System administration"}
         </div>
-        <nav className="d-flex flex-column gap-1">
+        <nav className="af-workspace-nav d-flex flex-column gap-1">
           {nav.map(([to, label]) => (
             <NavLink key={to} to={to} end={to === `/${type}`} className={({isActive}) =>
               `text-decoration-none rounded-3 px-3 py-2 ${isActive ? "bg-dark text-white" : "text-secondary"}`
@@ -79,7 +79,7 @@ if (
           </button>
         </div>
       </aside>
-      <main className="flex-grow-1 p-3 p-md-4 p-lg-5"><Outlet /></main>
+      <main className="af-workspace-main flex-grow-1 p-3 p-md-4 p-lg-5"><Outlet /></main>
     </div>
   );
 }

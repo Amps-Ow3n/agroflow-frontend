@@ -236,6 +236,21 @@ export function AuthProvider({ children }) {
     }
 
     const userId = identity.user?.id;
+    const schoolMemberships = memberships.filter(
+      (membership) =>
+        membership?.organization?.organization_type === "SCHOOL"
+    );
+
+    // A single verified organization is the canonical context. Do not allow
+    // a stale browser-level organization key from a previous session to keep
+    // a user on another valid organization.
+    if (schoolMemberships.length === 1) {
+      const organizationId = schoolMemberships[0]?.organization?.id;
+      storeOrganizationId(organizationId, userId);
+      setActiveOrganizationId(String(organizationId));
+      return;
+    }
+
     const rememberedId = getStoredOrganizationId(userId);
     const validRemembered = resolveActiveMembership(identity, rememberedId);
 
@@ -245,10 +260,9 @@ export function AuthProvider({ children }) {
       return;
     }
 
-    // A user normally belongs to one organization. When there are several,
-    // choose the first verified membership as the initial context and keep
-    // that choice per user. The server still validates every organization
-    // and resource access against the user's membership.
+    // Multiple verified organizations still require an explicit workspace
+    // choice; until a selector is used, preserve the deterministic first
+    // verified membership behavior from the existing implementation.
     const firstOrganizationId = memberships[0]?.organization?.id;
     storeOrganizationId(firstOrganizationId, userId);
     setActiveOrganizationId(String(firstOrganizationId));

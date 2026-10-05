@@ -16,21 +16,25 @@ const cards = [
 ];
 
 export default function SchoolDashboardPage() {
-  const { activeOrganizationId, hasPermission } = useAuth();
+  const { activeOrganizationId, activeMembership, loading: authLoading, hasPermission } = useAuth();
   const canCreateProcurement = hasPermission("procurement:create");
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (!activeOrganizationId) return;
+    const organizationId =
+      activeMembership?.organization?.id || activeOrganizationId;
+
+    if (authLoading || !organizationId) return;
 
     setLoading(true);
-    getOrganizationDashboard(activeOrganizationId)
+    setError("");
+    getOrganizationDashboard(organizationId)
       .then(setData)
       .catch((err) => setError(getApiError(err, "Unable to load the school dashboard.")))
       .finally(() => setLoading(false));
-  }, [activeOrganizationId]);
+  }, [authLoading, activeMembership, activeOrganizationId]);
 
   return (
     <Page
