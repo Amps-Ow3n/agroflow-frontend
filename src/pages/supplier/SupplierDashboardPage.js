@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 import { getSupplierCommitments } from "../../api/commitmentApi";
 import { getMySupplierPerformance, getSupplierHistory } from "../../api/performanceApi";
 import { getMySupplier } from "../../api/supplierApi";
-import { getSupplierHistory } from "../../api/performanceApi";
 
 import {
   Page,
