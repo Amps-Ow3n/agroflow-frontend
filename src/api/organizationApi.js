@@ -58,3 +58,14 @@ export async function addOrganizationMember(
 
   return data;
 }
+export async function decideOrganizationMembership(
+  organizationId,
+  membershipId,
+  decision
+) {
+  const { data } = await client.post(
+    `/organizations/${organizationId}/memberships/${membershipId}/decision`,
+    { decision }
+  );
+  return data;
+}

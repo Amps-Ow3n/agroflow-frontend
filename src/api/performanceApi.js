@@ -8,3 +8,8 @@ export async function getMySupplierPerformance() {
   const { data } = await client.get("/suppliers/me/performance");
   return data;
 }
+
+export async function getSupplierHistory() {
+  const { data } = await client.get("/suppliers/me/history");
+  return data;
+}

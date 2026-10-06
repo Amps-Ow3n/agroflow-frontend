@@ -12,6 +12,7 @@ import {
   getOrganizationMembers,
   getOrganizationResponsibilities,
   assignMemberResponsibility,
+  decideOrganizationMembership,
 } from "../../api/organizationApi";
 
 import {
@@ -87,6 +88,19 @@ const [
     busyUserId,
     setBusyUserId,
   ] = useState(null);
+
+  async function handleMembershipDecision(membershipId, decision) {
+    try {
+      setBusyUserId(membershipId);
+      setError("");
+      await decideOrganizationMembership(organizationId, membershipId, decision);
+      await load();
+    } catch (err) {
+      setError(err?.response?.data?.detail || "Unable to update membership request.");
+    } finally {
+      setBusyUserId(null);
+    }
+  }
 
 
   async function load() {
@@ -474,6 +488,26 @@ async function handleAddMember() {
 
                         <td>
 
+                          {member.membership_status === "PENDING" ? (
+                            <div className="d-flex gap-2">
+                              <button
+                                type="button"
+                                className="btn btn-success btn-sm"
+                                disabled={busyUserId !== null}
+                                onClick={() => handleMembershipDecision(member.membership_id, "APPROVE")}
+                              >
+                                {busyUserId === member.membership_id ? "Saving..." : "Approve"}
+                              </button>
+                              <button
+                                type="button"
+                                className="btn btn-outline-danger btn-sm"
+                                disabled={busyUserId !== null}
+                                onClick={() => handleMembershipDecision(member.membership_id, "REJECT")}
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          ) : (
                           <div className="d-flex gap-2">
 
                             <select
@@ -542,6 +576,7 @@ async function handleAddMember() {
                             </button>
 
                           </div>
+                          )}
 
                         </td>
 
